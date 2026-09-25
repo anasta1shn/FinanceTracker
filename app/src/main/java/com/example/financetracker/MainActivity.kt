@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.financetracker.ui.home.HomeScreen
+import com.example.financetracker.ui.add.AddTransactionScreen
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
@@ -41,12 +42,36 @@ fun FinanceTrackerApp() {
         mutableIntStateOf(0)
     }
 
+    var showAddTransactionScreen by remember {
+        mutableStateOf(false)
+    }
+
     val screens = listOf(
         "Главная",
         "Операции",
         "Статистика",
         "Настройки"
     )
+
+    // Если открыт экран добавления операции,
+    // показываем его вместо основного интерфейса
+    if (showAddTransactionScreen) {
+
+        AddTransactionScreen(
+            onBack = {
+                showAddTransactionScreen = false
+            },
+            onSave = { amount, isIncome, category, description ->
+
+                // Пока данные никуда не сохраняем.
+                // Room добавим на следующем этапе.
+
+                showAddTransactionScreen = false
+            }
+        )
+
+        return
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -86,7 +111,10 @@ fun FinanceTrackerApp() {
         when (selectedScreen) {
 
             0 -> HomeScreen(
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier.padding(innerPadding),
+                onAddTransaction = {
+                    showAddTransactionScreen = true
+                }
             )
 
             1 -> TransactionsScreen(

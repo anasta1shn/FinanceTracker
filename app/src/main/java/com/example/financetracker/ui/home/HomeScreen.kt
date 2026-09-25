@@ -32,7 +32,8 @@ data class RecentTransaction(
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAddTransaction: () -> Unit
 ) {
 
     val transactions = listOf(
@@ -61,9 +62,7 @@ fun HomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    // Пока ничего не делаем.
-                    // Позже здесь будет открываться
-                    // экран добавления операции.
+                    onAddTransaction()
                 }
             ) {
                 Text(
