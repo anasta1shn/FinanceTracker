@@ -4,44 +4,159 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
+
         setContent {
             FinanceTrackerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                FinanceTrackerApp()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
+fun FinanceTrackerApp() {
+
+    var selectedScreen by remember {
+        mutableIntStateOf(0)
+    }
+
+    val screens = listOf(
+        "Главная",
+        "Операции",
+        "Статистика",
+        "Настройки"
+    )
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+
+        bottomBar = {
+            NavigationBar {
+
+                screens.forEachIndexed { index, title ->
+
+                    NavigationBarItem(
+                        selected = selectedScreen == index,
+
+                        onClick = {
+                            selectedScreen = index
+                        },
+
+                        icon = {
+                            Text(
+                                text = when (index) {
+                                    0 -> "⌂"
+                                    1 -> "₽"
+                                    2 -> "▥"
+                                    else -> "⚙"
+                                }
+                            )
+                        },
+
+                        label = {
+                            Text(text = title)
+                        }
+                    )
+                }
+            }
+        }
+    ) { innerPadding ->
+
+        when (selectedScreen) {
+
+            0 -> HomeScreen(
+                modifier = Modifier.padding(innerPadding)
+            )
+
+            1 -> TransactionsScreen(
+                modifier = Modifier.padding(innerPadding)
+            )
+
+            2 -> StatisticsScreen(
+                modifier = Modifier.padding(innerPadding)
+            )
+
+            3 -> SettingsScreen(
+                modifier = Modifier.padding(innerPadding)
+            )
+        }
+    }
+}
+
+
+
+@Composable
+fun HomeScreen(
+    modifier: Modifier = Modifier
+) {
+    SimpleScreen(
+        title = "Главная",
         modifier = modifier
     )
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    FinanceTrackerTheme {
-        Greeting("Android")
+fun TransactionsScreen(
+    modifier: Modifier = Modifier
+) {
+    SimpleScreen(
+        title = "Операции",
+        modifier = modifier
+    )
+}
+
+@Composable
+fun StatisticsScreen(
+    modifier: Modifier = Modifier
+) {
+    SimpleScreen(
+        title = "Статистика",
+        modifier = modifier
+    )
+}
+
+@Composable
+fun SettingsScreen(
+    modifier: Modifier = Modifier
+) {
+    SimpleScreen(
+        title = "Настройки",
+        modifier = modifier
+    )
+}
+
+@Composable
+fun SimpleScreen(
+    title: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = title
+        )
     }
 }
