@@ -23,7 +23,13 @@ import com.example.financetracker.ui.add.AddTransactionViewModel
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.financetracker.ui.add.AddTransactionViewModelFactory
+import com.example.financetracker.ui.transactions.TransactionsScreen
+import com.example.financetracker.ui.transactions.TransactionsViewModel
+import com.example.financetracker.ui.transactions.TransactionsViewModelFactory
 import androidx.compose.ui.unit.dp
+import com.example.financetracker.ui.home.HomeViewModel
+import com.example.financetracker.ui.home.HomeViewModelFactory
+import androidx.compose.runtime.collectAsState
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -54,9 +60,24 @@ fun FinanceTrackerApp() {
         TransactionRepository(database.transactionDao())
     }
 
+    val homeViewModel: HomeViewModel = viewModel(
+        factory = HomeViewModelFactory(repository)
+    )
+
+    val homeTransactions by homeViewModel.transactions.collectAsState()
+    val balance by homeViewModel.balance.collectAsState()
+    val income by homeViewModel.income.collectAsState()
+    val expenses by homeViewModel.expenses.collectAsState()
+
     val viewModel: AddTransactionViewModel = viewModel(
         factory = AddTransactionViewModelFactory(repository)
     )
+
+    val transactionsViewModel: TransactionsViewModel = viewModel(
+        factory = TransactionsViewModelFactory(repository)
+    )
+
+    val transactions by transactionsViewModel.transactions.collectAsState()
 
     var selectedScreen by remember {
         mutableIntStateOf(0)
@@ -135,13 +156,18 @@ fun FinanceTrackerApp() {
         when (selectedScreen) {
 
             0 -> HomeScreen(
-                modifier = Modifier.padding(innerPadding),
+                balance = balance,
+                income = income,
+                expenses = expenses,
+                recentTransactions = homeTransactions.take(5),
                 onAddTransaction = {
                     showAddTransactionScreen = true
-                }
+                },
+                modifier = Modifier.padding(innerPadding)
             )
 
             1 -> TransactionsScreen(
+                transactions = transactions,
                 modifier = Modifier.padding(innerPadding)
             )
 
@@ -157,16 +183,6 @@ fun FinanceTrackerApp() {
 }
 
 
-
-@Composable
-fun TransactionsScreen(
-    modifier: Modifier = Modifier
-) {
-    SimpleScreen(
-        title = "Операции",
-        modifier = modifier
-    )
-}
 
 @Composable
 fun StatisticsScreen(

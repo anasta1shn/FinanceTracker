@@ -22,48 +22,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-
-data class RecentTransaction(
-    val title: String,
-    val category: String,
-    val amount: String,
-    val isIncome: Boolean
-)
+import com.example.financetracker.data.local.TransactionEntity
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
-    onAddTransaction: () -> Unit
+    balance: Double,
+    income: Double,
+    expenses: Double,
+    recentTransactions: List<TransactionEntity>,
+    onAddTransaction: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-
-    val transactions = listOf(
-        RecentTransaction(
-            title = "Ресторан",
-            category = "Еда",
-            amount = "-1 200 ₽",
-            isIncome = false
-        ),
-        RecentTransaction(
-            title = "Такси",
-            category = "Транспорт",
-            amount = "-450 ₽",
-            isIncome = false
-        ),
-        RecentTransaction(
-            title = "Зарплата",
-            category = "Доход",
-            amount = "+85 000 ₽",
-            isIncome = true
-        )
-    )
-
     Scaffold(
         modifier = modifier,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    onAddTransaction()
-                }
+                onClick = onAddTransaction
             ) {
                 Text(
                     text = "+"
@@ -110,7 +84,7 @@ fun HomeScreen(
             item {
 
                 BalanceCard(
-                    balance = "37 680 ₽"
+                    balance = formatMoney(balance)
                 )
             }
 
@@ -122,7 +96,7 @@ fun HomeScreen(
 
                     SummaryCard(
                         title = "Доходы",
-                        amount = "+85 000 ₽",
+                        amount = "+ ${formatMoney(income)}",
                         modifier = Modifier.weight(1f)
                     )
 
@@ -132,7 +106,7 @@ fun HomeScreen(
 
                     SummaryCard(
                         title = "Расходы",
-                        amount = "-47 320 ₽",
+                        amount = "- ${formatMoney(expenses)}",
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -151,11 +125,28 @@ fun HomeScreen(
                 )
             }
 
-            items(transactions) { transaction ->
+            if (recentTransactions.isEmpty()) {
 
-                TransactionItem(
-                    transaction = transaction
-                )
+                item {
+
+                    Text(
+                        text = "Пока нет операций",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+                }
+
+            } else {
+
+                items(
+                    items = recentTransactions,
+                    key = { it.id }
+                ) { transaction ->
+
+                    TransactionItem(
+                        transaction = transaction
+                    )
+                }
             }
 
             item {
@@ -166,6 +157,13 @@ fun HomeScreen(
             }
         }
     }
+}
+
+private fun formatMoney(amount: Double): String {
+    return String.format(
+        "%.2f ₽",
+        amount
+    )
 }
 
 @Composable
@@ -237,8 +235,10 @@ private fun SummaryCard(
 
 @Composable
 private fun TransactionItem(
-    transaction: RecentTransaction
+    transaction: TransactionEntity
 ) {
+
+    val sign = if (transaction.isIncome) "+" else "-"
 
     Card(
         modifier = Modifier.fillMaxWidth()
@@ -257,19 +257,21 @@ private fun TransactionItem(
             ) {
 
                 Text(
-                    text = transaction.title,
+                    text = transaction.category,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
 
-                Text(
-                    text = transaction.category,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                if (transaction.description.isNotBlank()) {
+                    Text(
+                        text = transaction.description,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
 
             Text(
-                text = transaction.amount,
+                text = "$sign ${formatMoney(transaction.amount)}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
