@@ -21,6 +21,8 @@ import com.example.financetracker.data.TransactionRepository
 import com.example.financetracker.data.local.DatabaseProvider
 import com.example.financetracker.ui.add.AddTransactionViewModel
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.financetracker.ui.add.AddTransactionViewModelFactory
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
@@ -52,6 +54,10 @@ fun FinanceTrackerApp() {
         TransactionRepository(database.transactionDao())
     }
 
+    val viewModel: AddTransactionViewModel = viewModel(
+        factory = AddTransactionViewModelFactory(repository)
+    )
+
     var selectedScreen by remember {
         mutableIntStateOf(0)
     }
@@ -77,8 +83,12 @@ fun FinanceTrackerApp() {
             },
             onSave = { amount, isIncome, category, description ->
 
-                // Пока данные никуда не сохраняем.
-                // Room добавим на следующем этапе.
+                viewModel.addTransaction(
+                    amount = amount,
+                    isIncome = isIncome,
+                    category = category,
+                    description = description
+                )
 
                 showAddTransactionScreen = false
             }
