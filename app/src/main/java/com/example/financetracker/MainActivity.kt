@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.financetracker.ui.home.HomeScreen
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
@@ -104,16 +105,6 @@ fun FinanceTrackerApp() {
 }
 
 
-
-@Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier
-) {
-    SimpleScreen(
-        title = "Главная",
-        modifier = modifier
-    )
-}
 
 @Composable
 fun TransactionsScreen(
