@@ -33,4 +33,10 @@ class TransactionRepository(
     ) {
         dao.delete(transaction)
     }
+
+    suspend fun updateTransaction(
+        transaction: TransactionEntity
+    ) {
+        dao.update(transaction)
+    }
 }

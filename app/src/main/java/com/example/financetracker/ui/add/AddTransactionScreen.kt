@@ -19,9 +19,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.financetracker.data.local.TransactionEntity
 
 @Composable
 fun AddTransactionScreen(
+    transaction: TransactionEntity? = null,
     onBack: () -> Unit,
     onSave: (
         amount: Double,
@@ -31,20 +33,28 @@ fun AddTransactionScreen(
     ) -> Unit
 ) {
 
-    var amount by remember {
-        mutableStateOf("")
+    var amount by remember(transaction) {
+        mutableStateOf(
+            transaction?.amount?.toString() ?: ""
+        )
     }
 
-    var isIncome by remember {
-        mutableStateOf(false)
+    var isIncome by remember(transaction) {
+        mutableStateOf(
+            transaction?.isIncome ?: false
+        )
     }
 
-    var category by remember {
-        mutableStateOf("")
+    var category by remember(transaction) {
+        mutableStateOf(
+            transaction?.category ?: ""
+        )
     }
 
-    var description by remember {
-        mutableStateOf("")
+    var description by remember(transaction) {
+        mutableStateOf(
+            transaction?.description ?: ""
+        )
     }
 
     Column(
@@ -70,7 +80,11 @@ fun AddTransactionScreen(
             )
 
             Text(
-                text = "Новая операция"
+                text = if (transaction == null) {
+                    "Новая операция"
+                } else {
+                    "Редактирование"
+                }
             )
         }
 
@@ -206,7 +220,13 @@ fun AddTransactionScreen(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Сохранить")
+            Text(
+                if (transaction == null) {
+                    "Сохранить"
+                } else {
+                    "Сохранить изменения"
+                }
+            )
         }
     }
 }

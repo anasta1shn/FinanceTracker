@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.example.financetracker.ui.home.HomeViewModel
 import com.example.financetracker.ui.home.HomeViewModelFactory
 import androidx.compose.runtime.collectAsState
+import com.example.financetracker.data.local.TransactionEntity
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -69,7 +70,7 @@ fun FinanceTrackerApp() {
     val income by homeViewModel.income.collectAsState()
     val expenses by homeViewModel.expenses.collectAsState()
 
-    val viewModel: AddTransactionViewModel = viewModel(
+    val addTransactionViewModel: AddTransactionViewModel = viewModel(
         factory = AddTransactionViewModelFactory(repository)
     )
 
@@ -87,6 +88,10 @@ fun FinanceTrackerApp() {
         mutableStateOf(false)
     }
 
+    var editingTransaction by remember {
+        mutableStateOf<TransactionEntity?>(null)
+    }
+
     val screens = listOf(
         "Главная",
         "Операции",
@@ -96,26 +101,39 @@ fun FinanceTrackerApp() {
 
     // Если открыт экран добавления операции,
     // показываем его вместо основного интерфейса
-    if (showAddTransactionScreen) {
-
+    if (showAddTransactionScreen || editingTransaction != null) {
         AddTransactionScreen(
+            transaction = editingTransaction,
             onBack = {
                 showAddTransactionScreen = false
+                editingTransaction = null
             },
             onSave = { amount, isIncome, category, description ->
 
-                viewModel.addTransaction(
-                    amount = amount,
-                    isIncome = isIncome,
-                    category = category,
-                    description = description
-                )
+                if (editingTransaction == null) {
+                    addTransactionViewModel.addTransaction(
+                        amount = amount,
+                        isIncome = isIncome,
+                        category = category,
+                        description = description
+                    )
+                } else {
+                    val updatedTransaction = editingTransaction!!.copy(
+                        amount = amount,
+                        isIncome = isIncome,
+                        category = category,
+                        description = description
+                    )
+
+                    transactionsViewModel.updateTransaction(
+                        updatedTransaction
+                    )
+                }
 
                 showAddTransactionScreen = false
+                editingTransaction = null
             }
         )
-
-        return
     }
 
     Scaffold(
@@ -170,6 +188,9 @@ fun FinanceTrackerApp() {
                 transactions = transactions,
                 onDelete = { transaction ->
                     transactionsViewModel.deleteTransaction(transaction)
+                },
+                onEdit = { transaction ->
+                    editingTransaction = transaction
                 },
                 modifier = Modifier.padding(innerPadding)
             )

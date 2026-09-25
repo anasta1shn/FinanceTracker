@@ -27,6 +27,7 @@ import com.example.financetracker.data.local.TransactionEntity
 fun TransactionsScreen(
     transactions: List<TransactionEntity>,
     onDelete: (TransactionEntity) -> Unit,
+    onEdit: (TransactionEntity) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -71,6 +72,9 @@ fun TransactionsScreen(
                         transaction = transaction,
                         onDelete = {
                             onDelete(transaction)
+                        },
+                        onEdit = {
+                            onEdit(transaction)
                         }
                     )
                 }
@@ -82,7 +86,8 @@ fun TransactionsScreen(
 @Composable
 private fun TransactionCard(
     transaction: TransactionEntity,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onEdit: () -> Unit
 ) {
     val sign = if (transaction.isIncome) "+" else "-"
 
@@ -121,6 +126,12 @@ private fun TransactionCard(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
+
+            TextButton(
+                onClick = onEdit
+            ) {
+                Text("Изменить")
+            }
 
             TextButton(
                 onClick = onDelete
