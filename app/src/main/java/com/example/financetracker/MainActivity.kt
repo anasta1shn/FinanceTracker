@@ -168,6 +168,9 @@ fun FinanceTrackerApp() {
 
             1 -> TransactionsScreen(
                 transactions = transactions,
+                onDelete = { transaction ->
+                    transactionsViewModel.deleteTransaction(transaction)
+                },
                 modifier = Modifier.padding(innerPadding)
             )
 

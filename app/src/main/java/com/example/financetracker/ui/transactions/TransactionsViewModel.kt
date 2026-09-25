@@ -7,9 +7,10 @@ import com.example.financetracker.data.local.TransactionEntity
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class TransactionsViewModel(
-    repository: TransactionRepository
+    private val repository: TransactionRepository
 ) : ViewModel() {
 
     val transactions: StateFlow<List<TransactionEntity>> =
@@ -19,4 +20,10 @@ class TransactionsViewModel(
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = emptyList()
             )
+
+    fun deleteTransaction(transaction: TransactionEntity) {
+        viewModelScope.launch {
+            repository.deleteTransaction(transaction)
+        }
+    }
 }

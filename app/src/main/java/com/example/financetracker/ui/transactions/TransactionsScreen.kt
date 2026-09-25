@@ -14,6 +14,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,6 +26,7 @@ import com.example.financetracker.data.local.TransactionEntity
 @Composable
 fun TransactionsScreen(
     transactions: List<TransactionEntity>,
+    onDelete: (TransactionEntity) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -66,7 +68,10 @@ fun TransactionsScreen(
                 ) { transaction ->
 
                     TransactionCard(
-                        transaction = transaction
+                        transaction = transaction,
+                        onDelete = {
+                            onDelete(transaction)
+                        }
                     )
                 }
             }
@@ -76,7 +81,8 @@ fun TransactionsScreen(
 
 @Composable
 private fun TransactionCard(
-    transaction: TransactionEntity
+    transaction: TransactionEntity,
+    onDelete: () -> Unit
 ) {
     val sign = if (transaction.isIncome) "+" else "-"
 
@@ -115,6 +121,12 @@ private fun TransactionCard(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
+
+            TextButton(
+                onClick = onDelete
+            ) {
+                Text("Удалить")
+            }
         }
     }
 }
