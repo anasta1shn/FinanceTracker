@@ -17,6 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.financetracker.ui.home.HomeScreen
 import com.example.financetracker.ui.add.AddTransactionScreen
+import com.example.financetracker.data.TransactionRepository
+import com.example.financetracker.data.local.DatabaseProvider
+import com.example.financetracker.ui.add.AddTransactionViewModel
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
@@ -37,6 +41,16 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun FinanceTrackerApp() {
+
+    val context = LocalContext.current
+
+    val database = remember {
+        DatabaseProvider.getDatabase(context)
+    }
+
+    val repository = remember {
+        TransactionRepository(database.transactionDao())
+    }
 
     var selectedScreen by remember {
         mutableIntStateOf(0)
