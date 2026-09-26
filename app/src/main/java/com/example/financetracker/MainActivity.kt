@@ -102,6 +102,7 @@ fun FinanceTrackerApp() {
     // Если открыт экран добавления операции,
     // показываем его вместо основного интерфейса
     if (showAddTransactionScreen || editingTransaction != null) {
+
         AddTransactionScreen(
             transaction = editingTransaction,
             onBack = {
@@ -134,74 +135,77 @@ fun FinanceTrackerApp() {
                 editingTransaction = null
             }
         )
-    }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
+    } else {
 
-        bottomBar = {
-            NavigationBar {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
 
-                screens.forEachIndexed { index, title ->
+            bottomBar = {
+                NavigationBar {
 
-                    NavigationBarItem(
-                        selected = selectedScreen == index,
+                    screens.forEachIndexed { index, title ->
 
-                        onClick = {
-                            selectedScreen = index
-                        },
+                        NavigationBarItem(
+                            selected = selectedScreen == index,
 
-                        icon = {
-                            Text(
-                                text = when (index) {
-                                    0 -> "⌂"
-                                    1 -> "₽"
-                                    2 -> "▥"
-                                    else -> "⚙"
-                                }
-                            )
-                        },
+                            onClick = {
+                                selectedScreen = index
+                            },
 
-                        label = {
-                            Text(text = title)
-                        }
-                    )
+                            icon = {
+                                Text(
+                                    text = when (index) {
+                                        0 -> "⌂"
+                                        1 -> "₽"
+                                        2 -> "▥"
+                                        else -> "⚙"
+                                    }
+                                )
+                            },
+
+                            label = {
+                                Text(text = title)
+                            }
+                        )
+                    }
                 }
             }
-        }
-    ) { innerPadding ->
+        ) { innerPadding ->
 
-        when (selectedScreen) {
+            when (selectedScreen) {
 
-            0 -> HomeScreen(
-                balance = balance,
-                income = income,
-                expenses = expenses,
-                recentTransactions = homeTransactions.take(5),
-                onAddTransaction = {
-                    showAddTransactionScreen = true
-                },
-                modifier = Modifier.padding(innerPadding)
-            )
+                0 -> HomeScreen(
+                    balance = balance,
+                    income = income,
+                    expenses = expenses,
+                    recentTransactions = homeTransactions.take(5),
+                    onAddTransaction = {
+                        editingTransaction = null
+                        showAddTransactionScreen = true
+                    },
+                    modifier = Modifier.padding(innerPadding)
+                )
 
-            1 -> TransactionsScreen(
-                transactions = transactions,
-                onDelete = { transaction ->
-                    transactionsViewModel.deleteTransaction(transaction)
-                },
-                onEdit = { transaction ->
-                    editingTransaction = transaction
-                },
-                modifier = Modifier.padding(innerPadding)
-            )
+                1 -> TransactionsScreen(
+                    transactions = transactions,
+                    onDelete = { transaction ->
+                        transactionsViewModel.deleteTransaction(transaction)
+                    },
+                    onEdit = { transaction ->
+                        editingTransaction = transaction
+                    },
+                    modifier = Modifier.padding(innerPadding)
+                )
 
-            2 -> StatisticsScreen(
-                modifier = Modifier.padding(innerPadding)
-            )
+                2 -> StatisticsScreen(
+                    modifier = Modifier.padding(innerPadding)
+                )
 
-            3 -> SettingsScreen(
-                modifier = Modifier.padding(innerPadding)
-            )
+                3 -> SettingsScreen(
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
         }
     }
 }
