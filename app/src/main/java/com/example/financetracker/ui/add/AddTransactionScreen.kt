@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -21,6 +24,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.data.local.TransactionEntity
 
+private val transactionCategories = listOf(
+    "Еда",
+    "Транспорт",
+    "Покупки",
+    "Развлечения",
+    "Здоровье",
+    "Жильё",
+    "Зарплата",
+    "Другое"
+)
+
 @Composable
 fun AddTransactionScreen(
     transaction: TransactionEntity? = null,
@@ -32,7 +46,6 @@ fun AddTransactionScreen(
         description: String
     ) -> Unit
 ) {
-
     var amount by remember(transaction) {
         mutableStateOf(
             transaction?.amount?.toString() ?: ""
@@ -57,18 +70,20 @@ fun AddTransactionScreen(
         )
     }
 
+    var categoryMenuExpanded by remember {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-
         verticalArrangement = Arrangement.Top
     ) {
 
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
-
             OutlinedButton(
                 onClick = onBack
             ) {
@@ -125,7 +140,7 @@ fun AddTransactionScreen(
             }
 
             Spacer(
-                modifier = Modifier.padding(horizontal = 4.dp)
+                modifier = Modifier.width(8.dp)
             )
 
             if (isIncome) {
@@ -169,17 +184,45 @@ fun AddTransactionScreen(
             modifier = Modifier.height(12.dp)
         )
 
-        OutlinedTextField(
-            value = category,
-            onValueChange = {
-                category = it
-            },
-            modifier = Modifier.fillMaxWidth(),
-            label = {
-                Text("Категория")
-            },
-            singleLine = true
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+            OutlinedButton(
+                onClick = {
+                    categoryMenuExpanded = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = if (category.isBlank()) {
+                        "Выберите категорию"
+                    } else {
+                        category
+                    }
+                )
+            }
+
+            DropdownMenu(
+                expanded = categoryMenuExpanded,
+                onDismissRequest = {
+                    categoryMenuExpanded = false
+                }
+            ) {
+                transactionCategories.forEach { item ->
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(item)
+                        },
+                        onClick = {
+                            category = item
+                            categoryMenuExpanded = false
+                        }
+                    )
+                }
+            }
+        }
 
         Spacer(
             modifier = Modifier.height(12.dp)
@@ -208,8 +251,11 @@ fun AddTransactionScreen(
                     .replace(",", ".")
                     .toDoubleOrNull()
 
-                if (amountValue != null && amountValue > 0) {
-
+                if (
+                    amountValue != null &&
+                    amountValue > 0 &&
+                    category.isNotBlank()
+                ) {
                     onSave(
                         amountValue,
                         isIncome,
