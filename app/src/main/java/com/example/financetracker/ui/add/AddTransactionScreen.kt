@@ -1,5 +1,6 @@
 package com.example.financetracker.ui.add
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,12 +18,18 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.data.local.TransactionEntity
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 private val transactionCategories = listOf(
     "Еда",
@@ -43,9 +50,12 @@ fun AddTransactionScreen(
         amount: Double,
         isIncome: Boolean,
         category: String,
-        description: String
+        description: String,
+        date: Long
     ) -> Unit
 ) {
+    val context = LocalContext.current
+
     var amount by remember(transaction) {
         mutableStateOf(
             transaction?.amount?.toString() ?: ""
@@ -70,8 +80,21 @@ fun AddTransactionScreen(
         )
     }
 
+    var selectedDate by remember(transaction) {
+        mutableLongStateOf(
+            transaction?.date ?: System.currentTimeMillis()
+        )
+    }
+
     var categoryMenuExpanded by remember {
         mutableStateOf(false)
+    }
+
+    val dateFormatter = remember {
+        SimpleDateFormat(
+            "dd.MM.yyyy",
+            Locale.getDefault()
+        )
     }
 
     Column(
@@ -228,6 +251,53 @@ fun AddTransactionScreen(
             modifier = Modifier.height(12.dp)
         )
 
+        OutlinedButton(
+            onClick = {
+                val calendar = Calendar.getInstance().apply {
+                    timeInMillis = selectedDate
+                }
+
+                DatePickerDialog(
+                    context,
+                    { _, year, month, dayOfMonth ->
+
+                        val newCalendar = Calendar.getInstance().apply {
+                            set(
+                                year,
+                                month,
+                                dayOfMonth,
+                                12,
+                                0,
+                                0
+                            )
+                            set(
+                                Calendar.MILLISECOND,
+                                0
+                            )
+                        }
+
+                        selectedDate = newCalendar.timeInMillis
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                ).show()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "Дата: ${
+                    dateFormatter.format(
+                        Date(selectedDate)
+                    )
+                }"
+            )
+        }
+
+        Spacer(
+            modifier = Modifier.height(12.dp)
+        )
+
         OutlinedTextField(
             value = description,
             onValueChange = {
@@ -260,7 +330,8 @@ fun AddTransactionScreen(
                         amountValue,
                         isIncome,
                         category,
-                        description
+                        description,
+                        selectedDate
                     )
                 }
             },

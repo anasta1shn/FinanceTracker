@@ -13,14 +13,16 @@ class AddTransactionViewModel(
         amount: Double,
         isIncome: Boolean,
         category: String,
-        description: String
+        description: String,
+        date: Long
     ) {
         viewModelScope.launch {
             repository.addTransaction(
                 amount = amount,
                 isIncome = isIncome,
                 category = category,
-                description = description
+                description = description,
+                date = date
             )
         }
     }

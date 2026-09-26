@@ -12,16 +12,18 @@ class TransactionRepository(
         amount: Double,
         isIncome: Boolean,
         category: String,
-        description: String
+        description: String,
+        date: Long
     ) {
-        dao.insert(
-            TransactionEntity(
-                amount = amount,
-                isIncome = isIncome,
-                category = category,
-                description = description
-            )
+        val transaction = TransactionEntity(
+            amount = amount,
+            isIncome = isIncome,
+            category = category,
+            description = description,
+            date = date
         )
+
+        dao.insert(transaction)
     }
 
     fun observeTransactions(): Flow<List<TransactionEntity>> {

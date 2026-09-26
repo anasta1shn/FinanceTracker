@@ -109,21 +109,23 @@ fun FinanceTrackerApp() {
                 showAddTransactionScreen = false
                 editingTransaction = null
             },
-            onSave = { amount, isIncome, category, description ->
+            onSave = { amount, isIncome, category, description, date ->
 
                 if (editingTransaction == null) {
                     addTransactionViewModel.addTransaction(
                         amount = amount,
                         isIncome = isIncome,
                         category = category,
-                        description = description
+                        description = description,
+                        date = date
                     )
                 } else {
                     val updatedTransaction = editingTransaction!!.copy(
                         amount = amount,
                         isIncome = isIncome,
                         category = category,
-                        description = description
+                        description = description,
+                        date = date
                     )
 
                     transactionsViewModel.updateTransaction(
