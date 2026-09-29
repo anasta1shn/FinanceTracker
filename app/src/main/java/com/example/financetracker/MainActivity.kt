@@ -215,6 +215,10 @@ fun FinanceTrackerApp() {
                     totalIncome = totalIncome,
                     totalExpenses = totalExpenses,
                     expensesByCategory = expensesByCategory,
+                    selectedPeriod = statisticsViewModel.period.collectAsState().value,
+                    onPeriodSelected = { period ->
+                        statisticsViewModel.setPeriod(period)
+                    },
                     modifier = Modifier.padding(innerPadding)
                 )
 
