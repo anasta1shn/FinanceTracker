@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -111,22 +113,44 @@ fun StatisticsScreen(
             expensesByCategory.forEach { categoryExpense ->
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
                         text = categoryExpense.category,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold
                     )
 
                     Text(
                         text = "${categoryExpense.amount} ₽",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
+
+                Spacer(
+                    modifier = Modifier.height(4.dp)
+                )
+
+                LinearProgressIndicator(
+                    progress = {
+                        categoryExpense.percentage.toFloat()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(
+                    modifier = Modifier.height(4.dp)
+                )
+
+                Text(
+                    text = "${(categoryExpense.percentage * 100).toInt()}%",
+                    style = MaterialTheme.typography.bodySmall
+                )
+
+                Spacer(
+                    modifier = Modifier.height(12.dp)
+                )
             }
         }
     }

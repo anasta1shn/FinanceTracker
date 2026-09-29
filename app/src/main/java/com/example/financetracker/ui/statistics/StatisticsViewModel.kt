@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.stateIn
 
 data class CategoryExpense(
     val category: String,
-    val amount: Double
+    val amount: Double,
+    val percentage: Double
 )
 
 class StatisticsViewModel(
@@ -55,13 +56,28 @@ class StatisticsViewModel(
     val expensesByCategory: StateFlow<List<CategoryExpense>> =
         transactions
             .map { list ->
-                list
-                    .filter { !it.isIncome }
+
+                val expenses = list.filter { !it.isIncome }
+
+                val totalExpenses = expenses.sumOf { it.amount }
+
+                expenses
                     .groupBy { it.category }
                     .map { (category, transactions) ->
+
+                        val amount = transactions.sumOf { it.amount }
+
+                        val percentage =
+                            if (totalExpenses > 0) {
+                                amount / totalExpenses
+                            } else {
+                                0.0
+                            }
+
                         CategoryExpense(
                             category = category,
-                            amount = transactions.sumOf { it.amount }
+                            amount = amount,
+                            percentage = percentage
                         )
                     }
                     .sortedByDescending { it.amount }
