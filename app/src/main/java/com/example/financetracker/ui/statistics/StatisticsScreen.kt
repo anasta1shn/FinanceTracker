@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.financetracker.util.formatCurrency
 
 @Composable
 fun StatisticsScreen(
@@ -130,7 +131,7 @@ fun StatisticsScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "${totalIncome} ₽",
+                    text = formatCurrency(totalIncome),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -153,7 +154,7 @@ fun StatisticsScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "${totalExpenses} ₽",
+                    text = formatCurrency(totalExpenses),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -189,7 +190,7 @@ fun StatisticsScreen(
                     )
 
                     Text(
-                        text = "${categoryExpense.amount} ₽",
+                        text = formatCurrency(categoryExpense.amount),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }

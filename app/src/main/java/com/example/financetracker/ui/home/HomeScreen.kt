@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.data.local.TransactionEntity
+import com.example.financetracker.util.formatCurrency
 
 @Composable
 fun HomeScreen(
@@ -51,7 +52,6 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp),
-
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
@@ -84,7 +84,7 @@ fun HomeScreen(
             item {
 
                 BalanceCard(
-                    balance = formatMoney(balance)
+                    balance = formatCurrency(balance)
                 )
             }
 
@@ -96,7 +96,7 @@ fun HomeScreen(
 
                     SummaryCard(
                         title = "Доходы",
-                        amount = "+ ${formatMoney(income)}",
+                        amount = "+ ${formatCurrency(income)}",
                         modifier = Modifier.weight(1f)
                     )
 
@@ -106,7 +106,7 @@ fun HomeScreen(
 
                     SummaryCard(
                         title = "Расходы",
-                        amount = "- ${formatMoney(expenses)}",
+                        amount = "- ${formatCurrency(expenses)}",
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -157,13 +157,6 @@ fun HomeScreen(
             }
         }
     }
-}
-
-private fun formatMoney(amount: Double): String {
-    return String.format(
-        "%.2f ₽",
-        amount
-    )
 }
 
 @Composable
@@ -248,7 +241,6 @@ private fun TransactionItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -271,7 +263,7 @@ private fun TransactionItem(
             }
 
             Text(
-                text = "$sign ${formatMoney(transaction.amount)}",
+                text = "$sign ${formatCurrency(transaction.amount)}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )

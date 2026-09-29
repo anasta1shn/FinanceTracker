@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.data.local.TransactionEntity
+import com.example.financetracker.util.formatCurrency
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -284,7 +285,7 @@ private fun TransactionCard(
             )
 
             Text(
-                text = "$sign ${transaction.amount} ₽",
+                text = "$sign ${formatCurrency(transaction.amount)}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
