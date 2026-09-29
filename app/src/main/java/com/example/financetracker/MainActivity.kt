@@ -31,6 +31,9 @@ import com.example.financetracker.ui.home.HomeViewModel
 import com.example.financetracker.ui.home.HomeViewModelFactory
 import androidx.compose.runtime.collectAsState
 import com.example.financetracker.data.local.TransactionEntity
+import com.example.financetracker.ui.statistics.StatisticsScreen
+import com.example.financetracker.ui.statistics.StatisticsViewModel
+import com.example.financetracker.ui.statistics.StatisticsViewModelFactory
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -77,6 +80,14 @@ fun FinanceTrackerApp() {
     val transactionsViewModel: TransactionsViewModel = viewModel(
         factory = TransactionsViewModelFactory(repository)
     )
+
+    val statisticsViewModel: StatisticsViewModel = viewModel(
+        factory = StatisticsViewModelFactory(repository)
+    )
+
+    val totalIncome by statisticsViewModel.totalIncome.collectAsState()
+    val totalExpenses by statisticsViewModel.totalExpenses.collectAsState()
+    val expensesByCategory by statisticsViewModel.expensesByCategory.collectAsState()
 
     val transactions by transactionsViewModel.transactions.collectAsState()
 
@@ -201,6 +212,9 @@ fun FinanceTrackerApp() {
                 )
 
                 2 -> StatisticsScreen(
+                    totalIncome = totalIncome,
+                    totalExpenses = totalExpenses,
+                    expensesByCategory = expensesByCategory,
                     modifier = Modifier.padding(innerPadding)
                 )
 
@@ -212,17 +226,6 @@ fun FinanceTrackerApp() {
     }
 }
 
-
-
-@Composable
-fun StatisticsScreen(
-    modifier: Modifier = Modifier
-) {
-    SimpleScreen(
-        title = "Статистика",
-        modifier = modifier
-    )
-}
 
 @Composable
 fun SettingsScreen(
