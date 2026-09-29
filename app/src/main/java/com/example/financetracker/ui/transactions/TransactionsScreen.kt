@@ -12,16 +12,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.data.local.TransactionEntity
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun TransactionsScreen(
@@ -30,6 +36,20 @@ fun TransactionsScreen(
     onEdit: (TransactionEntity) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var searchQuery by remember {
+        mutableStateOf("")
+    }
+
+    val filteredTransactions = transactions.filter { transaction ->
+        transaction.description.contains(
+            searchQuery,
+            ignoreCase = true
+        ) || transaction.category.contains(
+            searchQuery,
+            ignoreCase = true
+        )
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -41,21 +61,48 @@ fun TransactionsScreen(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.padding(top = 16.dp))
+        Spacer(
+            modifier = Modifier.padding(top = 16.dp)
+        )
 
-        if (transactions.isEmpty()) {
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = {
+                Text("Поиск")
+            },
+            placeholder = {
+                Text("Описание или категория")
+            },
+            singleLine = true
+        )
+
+        Spacer(
+            modifier = Modifier.padding(top = 16.dp)
+        )
+
+        if (filteredTransactions.isEmpty()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Пока нет операций",
+                    text = if (transactions.isEmpty()) {
+                        "Пока нет операций"
+                    } else {
+                        "Ничего не найдено"
+                    },
                     style = MaterialTheme.typography.titleMedium
                 )
 
                 Text(
-                    text = "Добавьте первую операцию",
+                    text = if (transactions.isEmpty()) {
+                        "Добавьте первую операцию"
+                    } else {
+                        "Попробуйте изменить запрос"
+                    },
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -64,7 +111,7 @@ fun TransactionsScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(
-                    items = transactions,
+                    items = filteredTransactions,
                     key = { it.id }
                 ) { transaction ->
 
@@ -91,6 +138,13 @@ private fun TransactionCard(
 ) {
     val sign = if (transaction.isIncome) "+" else "-"
 
+    val dateFormatter = remember {
+        SimpleDateFormat(
+            "dd.MM.yyyy",
+            Locale.getDefault()
+        )
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -107,6 +161,13 @@ private fun TransactionCard(
                     text = transaction.category,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
+                )
+
+                Text(
+                    text = dateFormatter.format(
+                        Date(transaction.date)
+                    ),
+                    style = MaterialTheme.typography.bodySmall
                 )
 
                 if (transaction.description.isNotBlank()) {
