@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -40,14 +43,38 @@ fun TransactionsScreen(
         mutableStateOf("")
     }
 
+    var transactionToDelete by remember {
+        mutableStateOf<TransactionEntity?>(null)
+    }
+
+    var selectedFilter by remember {
+        mutableStateOf("Все")
+    }
+
+    val filters = listOf(
+        "Все",
+        "Доходы",
+        "Расходы"
+    )
+
     val filteredTransactions = transactions.filter { transaction ->
-        transaction.description.contains(
-            searchQuery,
-            ignoreCase = true
-        ) || transaction.category.contains(
-            searchQuery,
-            ignoreCase = true
-        )
+
+        val matchesSearch =
+            transaction.description.contains(
+                searchQuery,
+                ignoreCase = true
+            ) || transaction.category.contains(
+                searchQuery,
+                ignoreCase = true
+            )
+
+        val matchesFilter = when (selectedFilter) {
+            "Доходы" -> transaction.isIncome
+            "Расходы" -> !transaction.isIncome
+            else -> true
+        }
+
+        matchesSearch && matchesFilter
     }
 
     Column(
@@ -77,6 +104,42 @@ fun TransactionsScreen(
             },
             singleLine = true
         )
+
+        Spacer(
+            modifier = Modifier.padding(top = 12.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            filters.forEach { filter ->
+                if (selectedFilter == filter) {
+                    Button(
+                        onClick = {
+                            selectedFilter = filter
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(filter)
+                    }
+                } else {
+                    OutlinedButton(
+                        onClick = {
+                            selectedFilter = filter
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(filter)
+                    }
+                }
+
+                if (filter != filters.last()) {
+                    Spacer(
+                        modifier = Modifier.width(8.dp)
+                    )
+                }
+            }
+        }
 
         Spacer(
             modifier = Modifier.padding(top = 16.dp)
@@ -118,7 +181,7 @@ fun TransactionsScreen(
                     TransactionCard(
                         transaction = transaction,
                         onDelete = {
-                            onDelete(transaction)
+                            transactionToDelete = transaction
                         },
                         onEdit = {
                             onEdit(transaction)
@@ -127,6 +190,44 @@ fun TransactionsScreen(
                 }
             }
         }
+    }
+
+    if (transactionToDelete != null) {
+        AlertDialog(
+            onDismissRequest = {
+                transactionToDelete = null
+            },
+            title = {
+                Text("Удалить операцию?")
+            },
+            text = {
+                Text(
+                    "Вы действительно хотите удалить эту операцию?"
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        transactionToDelete?.let { transaction ->
+                            onDelete(transaction)
+                        }
+
+                        transactionToDelete = null
+                    }
+                ) {
+                    Text("Удалить")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        transactionToDelete = null
+                    }
+                ) {
+                    Text("Отмена")
+                }
+            }
+        )
     }
 }
 
