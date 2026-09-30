@@ -304,6 +304,12 @@ private fun TransactionCard(
 ) {
     val sign = if (transaction.isIncome) "+" else "-"
 
+    val amountColor = if (transaction.isIncome) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.error
+    }
+
     val dateFormatter = remember {
         SimpleDateFormat(
             "dd.MM.yyyy",
@@ -314,60 +320,76 @@ private fun TransactionCard(
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = transaction.category,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                Text(
-                    text = dateFormatter.format(
-                        Date(transaction.date)
-                    ),
-                    style = MaterialTheme.typography.bodySmall
-                )
-
-                if (transaction.description.isNotBlank()) {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
-                        text = transaction.description,
-                        style = MaterialTheme.typography.bodyMedium
+                        text = transaction.category,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
                     )
+
+                    Text(
+                        text = dateFormatter.format(
+                            Date(transaction.date)
+                        ),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+
+                    if (transaction.description.isNotBlank()) {
+                        Spacer(modifier = Modifier.padding(top = 4.dp))
+
+                        Text(
+                            text = transaction.description,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Text(
+                    text = "$sign ${
+                        formatCurrency(
+                            amount = transaction.amount,
+                            currency = currency
+                        )
+                    }",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = amountColor
+                )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.padding(top = 8.dp))
 
-            Text(
-                text = "$sign ${
-                    formatCurrency(
-                        amount = transaction.amount,
-                        currency = currency
-                    )
-                }",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-
-            TextButton(
-                onClick = onEdit
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
             ) {
-                Text("Изменить")
-            }
+                TextButton(
+                    onClick = onEdit
+                ) {
+                    Text("Изменить")
+                }
 
-            TextButton(
-                onClick = onDelete
-            ) {
-                Text("Удалить")
+                TextButton(
+                    onClick = onDelete
+                ) {
+                    Text("Удалить")
+                }
             }
         }
     }
 }
+
+
