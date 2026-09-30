@@ -49,7 +49,12 @@ fun TransactionsScreen(
     var selectedFilter by remember { mutableStateOf("Все") }
     var selectedDateFilter by remember { mutableStateOf("Всё время") }
 
-    val filters = listOf("Все", "Доходы", "Расходы")
+    val filters = listOf(
+        "Все",
+        "Доходы",
+        "Расходы"
+    )
+
     val dateFilters = listOf(
         "Сегодня",
         "Эта неделя",
@@ -77,7 +82,10 @@ fun TransactionsScreen(
             "Эта неделя" -> {
                 val calendar = Calendar.getInstance()
 
-                calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+                calendar.set(
+                    Calendar.DAY_OF_WEEK,
+                    calendar.firstDayOfWeek
+                )
                 calendar.set(Calendar.HOUR_OF_DAY, 0)
                 calendar.set(Calendar.MINUTE, 0)
                 calendar.set(Calendar.SECOND, 0)
@@ -90,7 +98,10 @@ fun TransactionsScreen(
             "Этот месяц" -> {
                 val calendar = Calendar.getInstance()
 
-                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                calendar.set(
+                    Calendar.DAY_OF_MONTH,
+                    1
+                )
                 calendar.set(Calendar.HOUR_OF_DAY, 0)
                 calendar.set(Calendar.MINUTE, 0)
                 calendar.set(Calendar.SECOND, 0)
@@ -123,6 +134,19 @@ fun TransactionsScreen(
         matchesSearch && matchesFilter
     }
 
+    // Итоги по текущему фильтру
+    val filteredIncome = filteredTransactions
+        .filter { it.isIncome }
+        .sumOf { it.amount }
+
+    val filteredExpenses = filteredTransactions
+        .filter { !it.isIncome }
+        .sumOf { it.amount }
+
+    val filteredBalance = filteredIncome - filteredExpenses
+
+    val filteredTransactionsCount = filteredTransactions.size
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -134,18 +158,28 @@ fun TransactionsScreen(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.padding(top = 16.dp))
+        Spacer(
+            modifier = Modifier.padding(top = 16.dp)
+        )
 
         OutlinedTextField(
             value = searchQuery,
-            onValueChange = { searchQuery = it },
+            onValueChange = {
+                searchQuery = it
+            },
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Поиск") },
-            placeholder = { Text("Описание или категория") },
+            label = {
+                Text("Поиск")
+            },
+            placeholder = {
+                Text("Описание или категория")
+            },
             singleLine = true
         )
 
-        Spacer(modifier = Modifier.padding(top = 12.dp))
+        Spacer(
+            modifier = Modifier.padding(top = 12.dp)
+        )
 
         // Фильтр по типу операции
         Row(
@@ -173,14 +207,18 @@ fun TransactionsScreen(
                 }
 
                 if (filter != filters.last()) {
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(
+                        modifier = Modifier.width(8.dp)
+                    )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.padding(top = 12.dp))
+        Spacer(
+            modifier = Modifier.padding(top = 12.dp)
+        )
 
-        // Фильтр по дате с горизонтальной прокруткой
+        // Фильтр по дате
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -208,7 +246,120 @@ fun TransactionsScreen(
             }
         }
 
-        Spacer(modifier = Modifier.padding(top = 16.dp))
+        Spacer(
+            modifier = Modifier.padding(top = 16.dp)
+        )
+
+        // Итоги по текущему фильтру
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "Итоги",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text(
+                            text = "Доходы",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        Text(
+                            text = "+ ${
+                                formatCurrency(
+                                    filteredIncome,
+                                    currency
+                                )
+                            }",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Text(
+                            text = "Расходы",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        Text(
+                            text = "- ${
+                                formatCurrency(
+                                    filteredExpenses,
+                                    currency
+                                )
+                            }",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+
+                Spacer(
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+
+                Text(
+                    text = "Итого",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Text(
+                    text = if (filteredBalance >= 0) {
+                        "+ ${
+                            formatCurrency(
+                                filteredBalance,
+                                currency
+                            )
+                        }"
+                    } else {
+                        "- ${
+                            formatCurrency(
+                                -filteredBalance,
+                                currency
+                            )
+                        }"
+                    },
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = if (filteredBalance >= 0) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.error
+                    }
+                )
+
+                Spacer(
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+
+                Text(
+                    text = "Операций: $filteredTransactionsCount",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+        Spacer(
+            modifier = Modifier.padding(top = 16.dp)
+        )
 
         if (filteredTransactions.isEmpty()) {
             Column(
@@ -267,7 +418,9 @@ fun TransactionsScreen(
                 Text("Удалить операцию?")
             },
             text = {
-                Text("Вы действительно хотите удалить эту операцию?")
+                Text(
+                    "Вы действительно хотите удалить эту операцию?"
+                )
             },
             confirmButton = {
                 TextButton(
@@ -346,7 +499,9 @@ private fun TransactionCard(
                     )
 
                     if (transaction.description.isNotBlank()) {
-                        Spacer(modifier = Modifier.padding(top = 4.dp))
+                        Spacer(
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
 
                         Text(
                             text = transaction.description,
@@ -355,7 +510,9 @@ private fun TransactionCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(
+                    modifier = Modifier.width(12.dp)
+                )
 
                 Text(
                     text = "$sign ${
@@ -370,7 +527,9 @@ private fun TransactionCard(
                 )
             }
 
-            Spacer(modifier = Modifier.padding(top = 8.dp))
+            Spacer(
+                modifier = Modifier.padding(top = 8.dp)
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -391,5 +550,4 @@ private fun TransactionCard(
         }
     }
 }
-
 
