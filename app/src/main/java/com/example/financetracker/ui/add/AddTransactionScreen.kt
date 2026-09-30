@@ -11,23 +11,35 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.Work
+import androidx.compose.material.icons.filled.WorkOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -42,7 +54,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.material3.MaterialTheme
 import com.example.financetracker.data.local.TransactionEntity
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -112,10 +123,6 @@ fun AddTransactionScreen(
         )
     }
 
-    var categoryMenuExpanded by remember {
-        mutableStateOf(false)
-    }
-
     val transactionCategories = if (isIncome) {
         incomeCategories
     } else {
@@ -136,6 +143,7 @@ fun AddTransactionScreen(
         verticalArrangement = Arrangement.Top
     ) {
 
+        // Заголовок
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -181,6 +189,7 @@ fun AddTransactionScreen(
             modifier = Modifier.height(24.dp)
         )
 
+        // Тип операции
         Text(
             text = "Тип операции",
             style = MaterialTheme.typography.titleMedium,
@@ -294,6 +303,7 @@ fun AddTransactionScreen(
             modifier = Modifier.height(20.dp)
         )
 
+        // Сумма
         OutlinedTextField(
             value = amount,
             onValueChange = {
@@ -313,56 +323,72 @@ fun AddTransactionScreen(
         )
 
         Spacer(
-            modifier = Modifier.height(12.dp)
+            modifier = Modifier.height(16.dp)
         )
 
-        Column(
-            modifier = Modifier.fillMaxWidth()
+        // Категория
+        Text(
+            text = "Категория",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            items(transactionCategories) { item ->
 
-            OutlinedButton(
-                onClick = {
-                    categoryMenuExpanded = true
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            ) {
+                val isSelected = category == item
 
-                Icon(
-                    imageVector = Icons.Default.Category,
-                    contentDescription = null
-                )
-
-                Spacer(
-                    modifier = Modifier.width(8.dp)
-                )
-
-                Text(
-                    text = if (category.isBlank()) {
-                        "Выберите категорию"
-                    } else {
-                        category
-                    }
-                )
-            }
-
-            DropdownMenu(
-                expanded = categoryMenuExpanded,
-                onDismissRequest = {
-                    categoryMenuExpanded = false
-                }
-            ) {
-                transactionCategories.forEach { item ->
-
-                    DropdownMenuItem(
-                        text = {
-                            Text(item)
-                        },
-                        onClick = {
-                            category = item
-                            categoryMenuExpanded = false
+                Card(
+                    onClick = {
+                        category = item
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (isSelected) {
+                            MaterialTheme.colorScheme.primaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant
                         }
                     )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        CategoryIcon(
+                            category = item,
+                            isIncome = isIncome
+                        )
+
+                        Spacer(
+                            modifier = Modifier.width(8.dp)
+                        )
+
+                        Text(
+                            text = item,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = if (isSelected) {
+                                FontWeight.Bold
+                            } else {
+                                FontWeight.Normal
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -371,8 +397,10 @@ fun AddTransactionScreen(
             modifier = Modifier.height(12.dp)
         )
 
+        // Дата
         OutlinedButton(
             onClick = {
+
                 val calendar = Calendar.getInstance().apply {
                     timeInMillis = selectedDate
                 }
@@ -430,6 +458,7 @@ fun AddTransactionScreen(
             modifier = Modifier.height(12.dp)
         )
 
+        // Описание
         OutlinedTextField(
             value = description,
             onValueChange = {
@@ -452,6 +481,7 @@ fun AddTransactionScreen(
             modifier = Modifier.height(24.dp)
         )
 
+        // Сохранение
         Button(
             onClick = {
 
@@ -497,4 +527,36 @@ fun AddTransactionScreen(
             )
         }
     }
+}
+
+@Composable
+private fun CategoryIcon(
+    category: String,
+    isIncome: Boolean
+) {
+    val icon = when (category) {
+        "Еда" -> Icons.Default.Restaurant
+        "Транспорт" -> Icons.Default.DirectionsCar
+        "Покупки" -> Icons.Default.ShoppingBag
+        "Развлечения" -> Icons.Default.Movie
+        "Здоровье" -> Icons.Default.Favorite
+        "Жильё" -> Icons.Default.Home
+        "Образование" -> Icons.Default.School
+        "Зарплата" -> Icons.Default.Work
+        "Подработка" -> Icons.Default.WorkOutline
+        "Подарок" -> Icons.Default.CardGiftcard
+        "Инвестиции" -> Icons.Default.TrendingUp
+        else -> Icons.Default.MoreHoriz
+    }
+
+    Icon(
+        imageVector = icon,
+        contentDescription = category,
+        tint = if (isIncome) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.error
+        },
+        modifier = Modifier.size(28.dp)
+    )
 }
