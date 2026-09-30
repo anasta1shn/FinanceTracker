@@ -17,6 +17,12 @@ data class CategoryExpense(
     val percentage: Double
 )
 
+data class DailyExpense(
+    val date: Long,
+    val amount: Double
+)
+
+
 enum class StatisticsPeriod {
     TODAY,
     THIS_MONTH,
@@ -168,4 +174,51 @@ class StatisticsViewModel(
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = emptyList()
             )
+
+    val expensesByDay: StateFlow<List<DailyExpense>> =
+        filteredTransactions
+            .map { list ->
+
+                list
+                    .filter { !it.isIncome }
+                    .groupBy { transaction ->
+
+                        val calendar = java.util.Calendar.getInstance()
+
+                        calendar.timeInMillis = transaction.date
+
+                        calendar.set(
+                            java.util.Calendar.HOUR_OF_DAY,
+                            0
+                        )
+                        calendar.set(
+                            java.util.Calendar.MINUTE,
+                            0
+                        )
+                        calendar.set(
+                            java.util.Calendar.SECOND,
+                            0
+                        )
+                        calendar.set(
+                            java.util.Calendar.MILLISECOND,
+                            0
+                        )
+
+                        calendar.timeInMillis
+                    }
+                    .map { (date, transactions) ->
+
+                        DailyExpense(
+                            date = date,
+                            amount = transactions.sumOf { it.amount }
+                        )
+                    }
+                    .sortedBy { it.date }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = emptyList()
+            )
+
 }

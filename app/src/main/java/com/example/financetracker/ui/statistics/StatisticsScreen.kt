@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -25,12 +26,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.util.formatCurrency
+import com.example.financetracker.ui.statistics.DailyExpense
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun StatisticsScreen(
     totalIncome: Double,
     totalExpenses: Double,
     expensesByCategory: List<CategoryExpense>,
+    expensesByDay: List<DailyExpense>,
     selectedPeriod: StatisticsPeriod,
     onPeriodSelected: (StatisticsPeriod) -> Unit,
     modifier: Modifier = Modifier
@@ -183,6 +189,32 @@ fun StatisticsScreen(
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold
                         )
+                    }
+                }
+            }
+
+            if (expensesByDay.isNotEmpty()) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Text(
+                                text = "Расходы по дням",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Spacer(
+                                modifier = Modifier.height(16.dp)
+                            )
+
+                            ExpenseLineChart(
+                                expenses = expensesByDay
+                            )
+                        }
                     }
                 }
             }
@@ -365,3 +397,133 @@ private fun ExpensePieChart(
         }
     }
 }
+
+@Composable
+private fun ExpenseLineChart(
+    expenses: List<DailyExpense>
+) {
+    val dateFormatter = remember {
+        SimpleDateFormat(
+            "dd.MM",
+            Locale.getDefault()
+        )
+    }
+
+    if (expenses.isEmpty()) {
+        return
+    }
+
+    val maxAmount = expenses.maxOf { it.amount }
+
+    // Получаем цвет вне Canvas,
+    // потому что MaterialTheme — @Composable
+    val primaryColor = MaterialTheme.colorScheme.primary
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp)
+        ) {
+            val leftPadding = 20.dp.toPx()
+            val rightPadding = 20.dp.toPx()
+            val topPadding = 20.dp.toPx()
+            val bottomPadding = 30.dp.toPx()
+
+            val chartWidth =
+                size.width - leftPadding - rightPadding
+
+            val chartHeight =
+                size.height - topPadding - bottomPadding
+
+            if (maxAmount > 0) {
+
+                // Горизонтальная линия основания графика
+                drawLine(
+                    color = Color.LightGray,
+                    start = Offset(
+                        leftPadding,
+                        topPadding + chartHeight
+                    ),
+                    end = Offset(
+                        leftPadding + chartWidth,
+                        topPadding + chartHeight
+                    ),
+                    strokeWidth = 2.dp.toPx()
+                )
+
+                val points = expenses.mapIndexed { index, expense ->
+
+                    val x =
+                        if (expenses.size == 1) {
+                            leftPadding + chartWidth / 2
+                        } else {
+                            leftPadding +
+                                    chartWidth *
+                                    index /
+                                    (expenses.size - 1)
+                        }
+
+                    val y =
+                        topPadding +
+                                chartHeight -
+                                (
+                                        expense.amount /
+                                                maxAmount
+                                        ).toFloat() *
+                                chartHeight
+
+                    Offset(x, y)
+                }
+
+                // Линия графика
+                for (index in 0 until points.size - 1) {
+                    drawLine(
+                        color = primaryColor,
+                        start = points[index],
+                        end = points[index + 1],
+                        strokeWidth = 4.dp.toPx()
+                    )
+                }
+
+                // Точки графика
+                points.forEach { point ->
+                    drawCircle(
+                        color = primaryColor,
+                        radius = 6.dp.toPx(),
+                        center = point
+                    )
+                }
+            }
+        }
+
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = dateFormatter.format(
+                    Date(expenses.first().date)
+                ),
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            if (expenses.size > 1) {
+                Text(
+                    text = dateFormatter.format(
+                        Date(expenses.last().date)
+                    ),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
+}
+
+

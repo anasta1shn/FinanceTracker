@@ -88,6 +88,7 @@ fun FinanceTrackerApp() {
     val totalIncome by statisticsViewModel.totalIncome.collectAsState()
     val totalExpenses by statisticsViewModel.totalExpenses.collectAsState()
     val expensesByCategory by statisticsViewModel.expensesByCategory.collectAsState()
+    val expensesByDay by statisticsViewModel.expensesByDay.collectAsState()
 
     val transactions by transactionsViewModel.transactions.collectAsState()
 
@@ -215,6 +216,7 @@ fun FinanceTrackerApp() {
                     totalIncome = totalIncome,
                     totalExpenses = totalExpenses,
                     expensesByCategory = expensesByCategory,
+                    expensesByDay = expensesByDay,
                     selectedPeriod = statisticsViewModel.period.collectAsState().value,
                     onPeriodSelected = { period ->
                         statisticsViewModel.setPeriod(period)
