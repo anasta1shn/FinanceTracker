@@ -9,10 +9,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -22,9 +37,12 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.MaterialTheme
 import com.example.financetracker.data.local.TransactionEntity
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -119,25 +137,44 @@ fun AddTransactionScreen(
     ) {
 
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            OutlinedButton(
+
+            IconButton(
                 onClick = onBack
             ) {
-                Text("Назад")
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Назад"
+                )
             }
 
             Spacer(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.width(8.dp)
             )
 
-            Text(
-                text = if (transaction == null) {
-                    "Новая операция"
-                } else {
-                    "Редактирование"
-                }
-            )
+            Column {
+
+                Text(
+                    text = if (transaction == null) {
+                        "Новая операция"
+                    } else {
+                        "Редактирование"
+                    },
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = if (transaction == null) {
+                        "Добавьте новую финансовую операцию"
+                    } else {
+                        "Измените данные операции"
+                    },
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
 
         Spacer(
@@ -145,7 +182,9 @@ fun AddTransactionScreen(
         )
 
         Text(
-            text = "Тип операции"
+            text = "Тип операции",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
         )
 
         Spacer(
@@ -165,8 +204,18 @@ fun AddTransactionScreen(
                             category = ""
                         }
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = null
+                    )
+
+                    Spacer(
+                        modifier = Modifier.width(6.dp)
+                    )
+
                     Text("Расход")
                 }
             } else {
@@ -175,8 +224,18 @@ fun AddTransactionScreen(
                         isIncome = false
                         category = ""
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = null
+                    )
+
+                    Spacer(
+                        modifier = Modifier.width(6.dp)
+                    )
+
                     Text("Расход")
                 }
             }
@@ -194,8 +253,18 @@ fun AddTransactionScreen(
                             category = ""
                         }
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.TrendingUp,
+                        contentDescription = null
+                    )
+
+                    Spacer(
+                        modifier = Modifier.width(6.dp)
+                    )
+
                     Text("Доход")
                 }
             } else {
@@ -204,8 +273,18 @@ fun AddTransactionScreen(
                         isIncome = true
                         category = ""
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.TrendingUp,
+                        contentDescription = null
+                    )
+
+                    Spacer(
+                        modifier = Modifier.width(6.dp)
+                    )
+
                     Text("Доход")
                 }
             }
@@ -224,6 +303,12 @@ fun AddTransactionScreen(
             label = {
                 Text("Сумма")
             },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Payments,
+                    contentDescription = null
+                )
+            },
             singleLine = true
         )
 
@@ -239,8 +324,19 @@ fun AddTransactionScreen(
                 onClick = {
                     categoryMenuExpanded = true
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
             ) {
+
+                Icon(
+                    imageVector = Icons.Default.Category,
+                    contentDescription = null
+                )
+
+                Spacer(
+                    modifier = Modifier.width(8.dp)
+                )
+
                 Text(
                     text = if (category.isBlank()) {
                         "Выберите категорию"
@@ -294,6 +390,7 @@ fun AddTransactionScreen(
                                 0,
                                 0
                             )
+
                             set(
                                 Calendar.MILLISECOND,
                                 0
@@ -307,8 +404,19 @@ fun AddTransactionScreen(
                     calendar.get(Calendar.DAY_OF_MONTH)
                 ).show()
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
         ) {
+
+            Icon(
+                imageVector = Icons.Default.CalendarMonth,
+                contentDescription = null
+            )
+
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
+
             Text(
                 text = "Дата: ${
                     dateFormatter.format(
@@ -330,6 +438,12 @@ fun AddTransactionScreen(
             modifier = Modifier.fillMaxWidth(),
             label = {
                 Text("Описание")
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Description,
+                    contentDescription = null
+                )
             },
             singleLine = true
         )
@@ -359,10 +473,23 @@ fun AddTransactionScreen(
                     )
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(12.dp)
         ) {
+
+            Icon(
+                imageVector = Icons.Default.Save,
+                contentDescription = null
+            )
+
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
+
             Text(
-                if (transaction == null) {
+                text = if (transaction == null) {
                     "Сохранить"
                 } else {
                     "Сохранить изменения"
@@ -371,4 +498,3 @@ fun AddTransactionScreen(
         }
     }
 }
-
