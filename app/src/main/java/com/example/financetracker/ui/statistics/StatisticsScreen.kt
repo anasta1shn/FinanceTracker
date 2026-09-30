@@ -2,6 +2,7 @@ package com.example.financetracker.ui.statistics
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -484,64 +485,75 @@ private fun ExpensePieChart(
     totalExpenses: Double,
     currency: String
 ) {
+    val chartSize = 190.dp
+
     androidx.compose.foundation.layout.Box(
-        modifier = Modifier.size(220.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         contentAlignment = Alignment.Center
     ) {
-        Canvas(
-            modifier = Modifier.size(220.dp)
+        Box(
+            modifier = Modifier.size(chartSize),
+            contentAlignment = Alignment.Center
         ) {
-            val diameter = size.minDimension
-            val strokeWidth = 55.dp.toPx()
+            Canvas(
+                modifier = Modifier.size(chartSize)
+            ) {
+                val diameter = size.minDimension
+                val strokeWidth = 42.dp.toPx()
 
-            var startAngle = -90f
+                var startAngle = -90f
 
-            expenses.forEachIndexed { index, expense ->
-                val sweepAngle =
-                    (expense.percentage * 360).toFloat()
+                expenses.forEachIndexed { index, expense ->
+                    val sweepAngle =
+                        (expense.percentage * 360).toFloat()
 
-                drawArc(
-                    color = colors[index % colors.size],
-                    startAngle = startAngle,
-                    sweepAngle = sweepAngle,
-                    useCenter = false,
-                    style = androidx.compose.ui.graphics.drawscope.Stroke(
-                        width = strokeWidth
-                    ),
-                    topLeft = Offset(
-                        x = (size.width - diameter) / 2,
-                        y = (size.height - diameter) / 2
-                    ),
-                    size = androidx.compose.ui.geometry.Size(
-                        diameter,
-                        diameter
+                    drawArc(
+                        color = colors[index % colors.size],
+                        startAngle = startAngle,
+                        sweepAngle = sweepAngle,
+                        useCenter = false,
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(
+                            width = strokeWidth
+                        ),
+                        topLeft = Offset.Zero,
+                        size = androidx.compose.ui.geometry.Size(
+                            diameter,
+                            diameter
+                        )
                     )
+
+                    startAngle += sweepAngle
+                }
+            }
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = formatCurrency(
+                        amount = totalExpenses,
+                        currency = currency
+                    ),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
                 )
 
-                startAngle += sweepAngle
+                Spacer(
+                    modifier = Modifier.height(2.dp)
+                )
+
+                Text(
+                    text = "расходы",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
-        }
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = formatCurrency(
-                    amount = totalExpenses,
-                    currency = currency
-                ),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = "расходы",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }
+
 
 @Composable
 private fun ExpenseLineChart(
