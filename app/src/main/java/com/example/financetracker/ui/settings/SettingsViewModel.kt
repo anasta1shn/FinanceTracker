@@ -56,5 +56,21 @@ class SettingsViewModel(
             editor.apply()
         }
     }
-}
 
+    // Тёмная тема
+    private val _isDarkTheme = MutableStateFlow(
+        preferences.getBoolean("dark_theme", false)
+    )
+
+    val isDarkTheme: StateFlow<Boolean> = _isDarkTheme
+
+    fun setDarkTheme(enabled: Boolean) {
+        _isDarkTheme.value = enabled
+
+        viewModelScope.launch {
+            preferences.edit()
+                .putBoolean("dark_theme", enabled)
+                .apply()
+        }
+    }
+}

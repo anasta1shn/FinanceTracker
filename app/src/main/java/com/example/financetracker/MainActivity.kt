@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -19,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.financetracker.data.TransactionRepository
 import com.example.financetracker.data.local.DatabaseProvider
@@ -30,17 +30,16 @@ import com.example.financetracker.ui.add.AddTransactionViewModelFactory
 import com.example.financetracker.ui.home.HomeScreen
 import com.example.financetracker.ui.home.HomeViewModel
 import com.example.financetracker.ui.home.HomeViewModelFactory
+import com.example.financetracker.ui.settings.SettingsScreen
+import com.example.financetracker.ui.settings.SettingsViewModel
+import com.example.financetracker.ui.settings.SettingsViewModelFactory
 import com.example.financetracker.ui.statistics.StatisticsScreen
 import com.example.financetracker.ui.statistics.StatisticsViewModel
 import com.example.financetracker.ui.statistics.StatisticsViewModelFactory
-import com.example.financetracker.ui.settings.SettingsScreen
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 import com.example.financetracker.ui.transactions.TransactionsScreen
 import com.example.financetracker.ui.transactions.TransactionsViewModel
 import com.example.financetracker.ui.transactions.TransactionsViewModelFactory
-import androidx.compose.foundation.layout.padding
-import com.example.financetracker.ui.settings.SettingsViewModel
-import com.example.financetracker.ui.settings.SettingsViewModelFactory
 
 class MainActivity : ComponentActivity() {
 
@@ -50,15 +49,37 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            FinanceTrackerTheme {
-                FinanceTrackerApp()
-            }
+            FinanceTrackerApp()
         }
     }
 }
 
 @Composable
 fun FinanceTrackerApp() {
+
+    val context = LocalContext.current
+
+    val settingsViewModel: SettingsViewModel = viewModel(
+        factory = SettingsViewModelFactory(
+            context.applicationContext as Application
+        )
+    )
+
+    val isDarkTheme by settingsViewModel.isDarkTheme.collectAsState()
+
+    FinanceTrackerTheme(
+        darkTheme = isDarkTheme
+    ) {
+        FinanceTrackerContent(
+            settingsViewModel = settingsViewModel
+        )
+    }
+}
+
+@Composable
+private fun FinanceTrackerContent(
+    settingsViewModel: SettingsViewModel
+) {
 
     val context = LocalContext.current
 
@@ -91,12 +112,6 @@ fun FinanceTrackerApp() {
         factory = StatisticsViewModelFactory(repository)
     )
 
-    val settingsViewModel: SettingsViewModel = viewModel(
-        factory = SettingsViewModelFactory(
-            context.applicationContext as Application
-        )
-    )
-
     val currency by settingsViewModel.currency.collectAsState()
     val monthlyBudget by settingsViewModel.monthlyBudget.collectAsState()
 
@@ -126,8 +141,6 @@ fun FinanceTrackerApp() {
         "Настройки"
     )
 
-    // Если открыт экран добавления или редактирования операции,
-    // показываем его вместо основного интерфейса
     if (showAddTransactionScreen || editingTransaction != null) {
 
         AddTransactionScreen(
@@ -249,11 +262,15 @@ fun FinanceTrackerApp() {
                 3 -> SettingsScreen(
                     currency = currency,
                     monthlyBudget = monthlyBudget,
+                    isDarkTheme = settingsViewModel.isDarkTheme.collectAsState().value,
                     onCurrencySelected = { selectedCurrency ->
                         settingsViewModel.setCurrency(selectedCurrency)
                     },
                     onBudgetSaved = { budget ->
                         settingsViewModel.setMonthlyBudget(budget)
+                    },
+                    onThemeChanged = { enabled ->
+                        settingsViewModel.setDarkTheme(enabled)
                     },
                     modifier = Modifier.padding(innerPadding)
                 )
@@ -261,3 +278,4 @@ fun FinanceTrackerApp() {
         }
     }
 }
+
