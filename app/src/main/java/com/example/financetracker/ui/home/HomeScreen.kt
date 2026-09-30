@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.CardGiftcard
@@ -20,10 +21,12 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.filled.WorkOutline
 import androidx.compose.material3.Card
@@ -37,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.data.local.TransactionEntity
@@ -59,8 +63,9 @@ fun HomeScreen(
             FloatingActionButton(
                 onClick = onAddTransaction
             ) {
-                Text(
-                    text = "+"
+                Icon(
+                    imageVector = Icons.Default.Payments,
+                    contentDescription = "Добавить операцию"
                 )
             }
         }
@@ -82,11 +87,12 @@ fun HomeScreen(
 
                 Text(
                     text = "Сентябрь 2026",
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(
-                    modifier = Modifier.height(8.dp)
+                    modifier = Modifier.height(6.dp)
                 )
 
                 Text(
@@ -100,6 +106,7 @@ fun HomeScreen(
                 )
             }
 
+            // Баланс
             item {
 
                 BalanceCard(
@@ -110,8 +117,11 @@ fun HomeScreen(
                 )
             }
 
+            // Бюджет
             if (monthlyBudget != null) {
+
                 item {
+
                     BudgetCard(
                         spent = expenses,
                         budget = monthlyBudget,
@@ -120,42 +130,39 @@ fun HomeScreen(
                 }
             }
 
+            // Доходы и расходы
             item {
 
                 Row(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
 
                     SummaryCard(
                         title = "Доходы",
-                        amount = "+ ${
-                            formatCurrency(
-                                amount = income,
-                                currency = currency
-                            )
-                        }",
+                        amount = formatCurrency(
+                            amount = income,
+                            currency = currency
+                        ),
                         amountColor = MaterialTheme.colorScheme.primary,
+                        icon = Icons.Default.TrendingUp,
                         modifier = Modifier.weight(1f)
-                    )
-
-                    Spacer(
-                        modifier = Modifier.width(12.dp)
                     )
 
                     SummaryCard(
                         title = "Расходы",
-                        amount = "- ${
-                            formatCurrency(
-                                amount = expenses,
-                                currency = currency
-                            )
-                        }",
+                        amount = formatCurrency(
+                            amount = expenses,
+                            currency = currency
+                        ),
                         amountColor = MaterialTheme.colorScheme.error,
+                        icon = Icons.Default.Payments,
                         modifier = Modifier.weight(1f)
                     )
                 }
             }
 
+            // Последние операции
             item {
 
                 Spacer(
@@ -173,11 +180,49 @@ fun HomeScreen(
 
                 item {
 
-                    Text(
-                        text = "Пока нет операций",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(vertical = 16.dp)
-                    )
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+
+                            Icon(
+                                imageVector = Icons.Default.AccountBalance,
+                                contentDescription = null,
+                                modifier = Modifier.size(40.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+
+                            Spacer(
+                                modifier = Modifier.height(10.dp)
+                            )
+
+                            Text(
+                                text = "Пока нет операций",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Spacer(
+                                modifier = Modifier.height(4.dp)
+                            )
+
+                            Text(
+                                text = "Добавьте первую операцию",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
 
             } else {
@@ -211,6 +256,7 @@ private fun BalanceCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )
@@ -220,19 +266,46 @@ private fun BalanceCard(
             modifier = Modifier.padding(20.dp)
         ) {
 
-            Text(
-                text = "Баланс",
-                style = MaterialTheme.typography.labelLarge
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Icon(
+                    imageVector = Icons.Default.AccountBalance,
+                    contentDescription = null,
+                    modifier = Modifier.size(26.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(
+                    modifier = Modifier.width(10.dp)
+                )
+
+                Text(
+                    text = "Баланс",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
 
             Spacer(
-                modifier = Modifier.height(8.dp)
+                modifier = Modifier.height(10.dp)
             )
 
             Text(
                 text = balance,
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold
+            )
+
+            Spacer(
+                modifier = Modifier.height(4.dp)
+            )
+
+            Text(
+                text = "Текущее состояние финансов",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
     }
@@ -289,47 +362,83 @@ private fun BudgetCard(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp)
     ) {
 
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
 
-            Text(
-                text = "Бюджет на месяц",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Icon(
+                    imageVector = Icons.Default.Wallet,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                Spacer(
+                    modifier = Modifier.width(10.dp)
+                )
+
+                Text(
+                    text = "Бюджет на месяц",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
             Spacer(
-                modifier = Modifier.height(8.dp)
+                modifier = Modifier.height(10.dp)
             )
 
-            Text(
-                text = "${formatCurrency(
-                    amount = spent,
-                    currency = currency
-                )} из ${formatCurrency(
-                    amount = budget,
-                    currency = currency
-                )}",
-                style = MaterialTheme.typography.bodyLarge
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Text(
+                    text = formatCurrency(
+                        amount = spent,
+                        currency = currency
+                    ),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = " из ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Text(
+                    text = formatCurrency(
+                        amount = budget,
+                        currency = currency
+                    ),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
 
             Spacer(
-                modifier = Modifier.height(8.dp)
+                modifier = Modifier.height(10.dp)
             )
 
             LinearProgressIndicator(
                 progress = {
                     progress
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
             )
 
             Spacer(
-                modifier = Modifier.height(8.dp)
+                modifier = Modifier.height(10.dp)
             )
 
             Text(
@@ -356,7 +465,7 @@ private fun BudgetCard(
             )
 
             Spacer(
-                modifier = Modifier.height(8.dp)
+                modifier = Modifier.height(6.dp)
             )
 
             Text(
@@ -373,25 +482,46 @@ private fun BudgetCard(
 private fun SummaryCard(
     title: String,
     amount: String,
-    amountColor: androidx.compose.ui.graphics.Color,
+    amountColor: Color,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     modifier: Modifier = Modifier
 ) {
 
     Card(
-        modifier = modifier
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
     ) {
 
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
 
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelLarge
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(22.dp),
+                    tint = amountColor
+                )
+
+                Spacer(
+                    modifier = Modifier.width(8.dp)
+                )
+
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
 
             Spacer(
-                modifier = Modifier.height(6.dp)
+                modifier = Modifier.height(8.dp)
             )
 
             Text(
@@ -419,7 +549,11 @@ private fun TransactionItem(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
     ) {
 
         Row(
@@ -449,12 +583,22 @@ private fun TransactionItem(
                 )
 
                 if (transaction.description.isNotBlank()) {
+
+                    Spacer(
+                        modifier = Modifier.height(2.dp)
+                    )
+
                     Text(
                         text = transaction.description,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
+
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
 
             Text(
                 text = "$sign ${
@@ -508,3 +652,4 @@ private fun CategoryIcon(
         }
     )
 }
+
