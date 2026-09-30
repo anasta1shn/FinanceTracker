@@ -7,6 +7,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -199,18 +205,21 @@ private fun FinanceTrackerContent(
                             },
 
                             icon = {
-                                Text(
-                                    text = when (index) {
-                                        0 -> "⌂"
-                                        1 -> "₽"
-                                        2 -> "▥"
-                                        else -> "⚙"
-                                    }
+                                Icon(
+                                    imageVector = when (index) {
+                                        0 -> Icons.Default.Home
+                                        1 -> Icons.Default.ReceiptLong
+                                        2 -> Icons.Default.BarChart
+                                        else -> Icons.Default.Settings
+                                    },
+                                    contentDescription = title
                                 )
                             },
 
                             label = {
-                                Text(text = title)
+                                Text(
+                                    text = title
+                                )
                             }
                         )
                     }
@@ -278,4 +287,3 @@ private fun FinanceTrackerContent(
         }
     }
 }
-
