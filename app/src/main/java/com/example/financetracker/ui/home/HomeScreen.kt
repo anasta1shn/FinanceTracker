@@ -118,6 +118,7 @@ fun HomeScreen(
                                 currency = currency
                             )
                         }",
+                        amountColor = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f)
                     )
 
@@ -133,6 +134,7 @@ fun HomeScreen(
                                 currency = currency
                             )
                         }",
+                        amountColor = MaterialTheme.colorScheme.error,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -235,6 +237,7 @@ private fun BudgetCard(
     }
 
     val remaining = budget - spent
+
     val spentPercentage = if (budget > 0) {
         spent / budget
     } else {
@@ -272,9 +275,11 @@ private fun BudgetCard(
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
+
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+
             Text(
                 text = "Бюджет на месяц",
                 style = MaterialTheme.typography.titleMedium,
@@ -348,11 +353,11 @@ private fun BudgetCard(
     }
 }
 
-
 @Composable
 private fun SummaryCard(
     title: String,
     amount: String,
+    amountColor: androidx.compose.ui.graphics.Color,
     modifier: Modifier = Modifier
 ) {
 
@@ -376,7 +381,8 @@ private fun SummaryCard(
             Text(
                 text = amount,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = amountColor
             )
         }
     }
@@ -389,6 +395,12 @@ private fun TransactionItem(
 ) {
 
     val sign = if (transaction.isIncome) "+" else "-"
+
+    val amountColor = if (transaction.isIncome) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.error
+    }
 
     Card(
         modifier = Modifier.fillMaxWidth()
@@ -427,9 +439,9 @@ private fun TransactionItem(
                     )
                 }",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = amountColor
             )
         }
     }
 }
-
