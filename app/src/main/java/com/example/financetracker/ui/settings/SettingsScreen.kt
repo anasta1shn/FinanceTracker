@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
@@ -41,7 +42,9 @@ fun SettingsScreen(
     onThemeChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var currencyMenuExpanded by remember { mutableStateOf(false) }
+    var currencyMenuExpanded by remember {
+        mutableStateOf(false)
+    }
 
     var budgetText by remember(monthlyBudget) {
         mutableStateOf(
@@ -63,42 +66,82 @@ fun SettingsScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+
         Text(
             text = "Настройки",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Настройте приложение под себя",
+            style = MaterialTheme.typography.bodyMedium
+        )
 
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
+        Spacer(
+            modifier = Modifier.height(4.dp)
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+
                 Text(
                     text = "Основные настройки",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(
+                    modifier = Modifier.height(4.dp)
+                )
+
+                Text(
+                    text = "Выберите валюту, которая будет использоваться в приложении.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Spacer(
+                    modifier = Modifier.height(16.dp)
+                )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Валюта",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
 
-                    Column {
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = "Валюта",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Text(
+                            text = "Текущая: $currency",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.End
+                    ) {
+
                         TextButton(
-                            onClick = { currencyMenuExpanded = true }
+                            onClick = {
+                                currencyMenuExpanded = true
+                            }
                         ) {
                             Text(
                                 text = currency,
                                 style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.Bold
                             )
                         }
 
@@ -108,9 +151,15 @@ fun SettingsScreen(
                                 currencyMenuExpanded = false
                             }
                         ) {
+
                             currencies.forEach { item ->
+
                                 DropdownMenuItem(
-                                    text = { Text(text = item) },
+                                    text = {
+                                        Text(
+                                            text = item
+                                        )
+                                    },
                                     onClick = {
                                         onCurrencySelected(item)
                                         currencyMenuExpanded = false
@@ -123,22 +172,31 @@ fun SettingsScreen(
             }
         }
 
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+
                 Text(
                     text = "Бюджет",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(
+                    modifier = Modifier.height(4.dp)
+                )
 
                 Text(
-                    text = "Месячный бюджет",
+                    text = "Установите максимальную сумму расходов на месяц.",
                     style = MaterialTheme.typography.bodyMedium
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(
+                    modifier = Modifier.height(16.dp)
+                )
 
                 OutlinedTextField(
                     value = budgetText,
@@ -146,16 +204,24 @@ fun SettingsScreen(
                         budgetText = value
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Сумма") },
-                    placeholder = { Text("Например, 50000") },
-                    suffix = { Text(currency) },
+                    label = {
+                        Text("Месячный бюджет")
+                    },
+                    placeholder = {
+                        Text("Например, 50000")
+                    },
+                    suffix = {
+                        Text(currency)
+                    },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal
                     )
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(
+                    modifier = Modifier.height(12.dp)
+                )
 
                 Button(
                     onClick = {
@@ -169,23 +235,36 @@ fun SettingsScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Сохранить")
+                    Text("Сохранить бюджет")
                 }
 
                 if (monthlyBudget != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        text = "Текущий бюджет: ${
-                            formatCurrency(
-                                amount = monthlyBudget,
-                                currency = currency
-                            )
-                        }",
-                        style = MaterialTheme.typography.bodyMedium
+                    Spacer(
+                        modifier = Modifier.height(16.dp)
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Текущий бюджет",
+                        style = MaterialTheme.typography.labelLarge
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(4.dp)
+                    )
+
+                    Text(
+                        text = formatCurrency(
+                            amount = monthlyBudget,
+                            currency = currency
+                        ),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(12.dp)
+                    )
 
                     OutlinedButton(
                         onClick = {
@@ -200,7 +279,10 @@ fun SettingsScreen(
             }
         }
 
-        Card(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -208,26 +290,43 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
+
                     Text(
                         text = "Внешний вид",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(
+                        modifier = Modifier.height(4.dp)
+                    )
 
                     Text(
                         text = if (isDarkTheme) {
-                            "Тёмная тема"
+                            "Сейчас используется тёмная тема"
                         } else {
-                            "Светлая тема"
+                            "Сейчас используется светлая тема"
                         },
                         style = MaterialTheme.typography.bodyMedium
                     )
+
+                    Spacer(
+                        modifier = Modifier.height(2.dp)
+                    )
+
+                    Text(
+                        text = "Изменить оформление приложения",
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
+
+                Spacer(
+                    modifier = Modifier.width(12.dp)
+                )
 
                 Switch(
                     checked = isDarkTheme,
@@ -239,3 +338,4 @@ fun SettingsScreen(
         }
     }
 }
+
