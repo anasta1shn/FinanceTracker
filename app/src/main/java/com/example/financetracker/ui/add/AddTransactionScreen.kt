@@ -31,14 +31,22 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-private val transactionCategories = listOf(
+private val expenseCategories = listOf(
     "Еда",
     "Транспорт",
     "Покупки",
     "Развлечения",
     "Здоровье",
     "Жильё",
+    "Образование",
+    "Другое"
+)
+
+private val incomeCategories = listOf(
     "Зарплата",
+    "Подработка",
+    "Подарок",
+    "Инвестиции",
     "Другое"
 )
 
@@ -88,6 +96,12 @@ fun AddTransactionScreen(
 
     var categoryMenuExpanded by remember {
         mutableStateOf(false)
+    }
+
+    val transactionCategories = if (isIncome) {
+        incomeCategories
+    } else {
+        expenseCategories
     }
 
     val dateFormatter = remember {
@@ -146,6 +160,10 @@ fun AddTransactionScreen(
                 Button(
                     onClick = {
                         isIncome = false
+
+                        if (category !in expenseCategories) {
+                            category = ""
+                        }
                     },
                     modifier = Modifier.weight(1f)
                 ) {
@@ -155,6 +173,7 @@ fun AddTransactionScreen(
                 OutlinedButton(
                     onClick = {
                         isIncome = false
+                        category = ""
                     },
                     modifier = Modifier.weight(1f)
                 ) {
@@ -170,6 +189,10 @@ fun AddTransactionScreen(
                 Button(
                     onClick = {
                         isIncome = true
+
+                        if (category !in incomeCategories) {
+                            category = ""
+                        }
                     },
                     modifier = Modifier.weight(1f)
                 ) {
@@ -179,6 +202,7 @@ fun AddTransactionScreen(
                 OutlinedButton(
                     onClick = {
                         isIncome = true
+                        category = ""
                     },
                     modifier = Modifier.weight(1f)
                 ) {
@@ -347,3 +371,4 @@ fun AddTransactionScreen(
         }
     }
 }
+
