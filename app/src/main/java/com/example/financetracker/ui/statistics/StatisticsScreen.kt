@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.financetracker.util.formatCurrency
-import com.example.financetracker.ui.statistics.DailyExpense
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -39,6 +38,7 @@ fun StatisticsScreen(
     expensesByDay: List<DailyExpense>,
     selectedPeriod: StatisticsPeriod,
     onPeriodSelected: (StatisticsPeriod) -> Unit,
+    currency: String,
     modifier: Modifier = Modifier
 ) {
     val chartColors = listOf(
@@ -160,7 +160,10 @@ fun StatisticsScreen(
                         )
 
                         Text(
-                            text = formatCurrency(totalIncome),
+                            text = formatCurrency(
+                                amount = totalIncome,
+                                currency = currency
+                            ),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold
                         )
@@ -185,7 +188,10 @@ fun StatisticsScreen(
                         )
 
                         Text(
-                            text = formatCurrency(totalExpenses),
+                            text = formatCurrency(
+                                amount = totalExpenses,
+                                currency = currency
+                            ),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold
                         )
@@ -241,7 +247,8 @@ fun StatisticsScreen(
                             ExpensePieChart(
                                 expenses = expensesByCategory,
                                 colors = chartColors,
-                                totalExpenses = totalExpenses
+                                totalExpenses = totalExpenses,
+                                currency = currency
                             )
                         }
                     }
@@ -283,7 +290,10 @@ fun StatisticsScreen(
                             )
 
                             Text(
-                                text = formatCurrency(categoryExpense.amount),
+                                text = formatCurrency(
+                                    amount = categoryExpense.amount,
+                                    currency = currency
+                                ),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }
@@ -340,7 +350,8 @@ fun StatisticsScreen(
 private fun ExpensePieChart(
     expenses: List<CategoryExpense>,
     colors: List<Color>,
-    totalExpenses: Double
+    totalExpenses: Double,
+    currency: String
 ) {
     androidx.compose.foundation.layout.Box(
         modifier = Modifier.size(220.dp),
@@ -385,7 +396,10 @@ private fun ExpensePieChart(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = formatCurrency(totalExpenses),
+                text = formatCurrency(
+                    amount = totalExpenses,
+                    currency = currency
+                ),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -415,8 +429,6 @@ private fun ExpenseLineChart(
 
     val maxAmount = expenses.maxOf { it.amount }
 
-    // Получаем цвет вне Canvas,
-    // потому что MaterialTheme — @Composable
     val primaryColor = MaterialTheme.colorScheme.primary
 
     Column(
@@ -440,7 +452,6 @@ private fun ExpenseLineChart(
 
             if (maxAmount > 0) {
 
-                // Горизонтальная линия основания графика
                 drawLine(
                     color = Color.LightGray,
                     start = Offset(
@@ -478,7 +489,6 @@ private fun ExpenseLineChart(
                     Offset(x, y)
                 }
 
-                // Линия графика
                 for (index in 0 until points.size - 1) {
                     drawLine(
                         color = primaryColor,
@@ -488,7 +498,6 @@ private fun ExpenseLineChart(
                     )
                 }
 
-                // Точки графика
                 points.forEach { point ->
                     drawCircle(
                         color = primaryColor,
@@ -525,5 +534,3 @@ private fun ExpenseLineChart(
         }
     }
 }
-
-

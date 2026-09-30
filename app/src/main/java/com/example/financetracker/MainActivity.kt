@@ -1,40 +1,46 @@
 package com.example.financetracker
 
+import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.example.financetracker.ui.home.HomeScreen
-import com.example.financetracker.ui.add.AddTransactionScreen
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.financetracker.data.TransactionRepository
 import com.example.financetracker.data.local.DatabaseProvider
+import com.example.financetracker.data.local.TransactionEntity
+import com.example.financetracker.ui.add.AddTransactionScreen
 import com.example.financetracker.ui.add.AddTransactionViewModel
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.financetracker.ui.add.AddTransactionViewModelFactory
-import com.example.financetracker.ui.transactions.TransactionsScreen
-import com.example.financetracker.ui.transactions.TransactionsViewModel
-import com.example.financetracker.ui.transactions.TransactionsViewModelFactory
-import androidx.compose.ui.unit.dp
+import com.example.financetracker.ui.home.HomeScreen
 import com.example.financetracker.ui.home.HomeViewModel
 import com.example.financetracker.ui.home.HomeViewModelFactory
-import androidx.compose.runtime.collectAsState
-import com.example.financetracker.data.local.TransactionEntity
 import com.example.financetracker.ui.statistics.StatisticsScreen
 import com.example.financetracker.ui.statistics.StatisticsViewModel
 import com.example.financetracker.ui.statistics.StatisticsViewModelFactory
+import com.example.financetracker.ui.settings.SettingsScreen
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
+import com.example.financetracker.ui.transactions.TransactionsScreen
+import com.example.financetracker.ui.transactions.TransactionsViewModel
+import com.example.financetracker.ui.transactions.TransactionsViewModelFactory
+import androidx.compose.foundation.layout.padding
+import com.example.financetracker.ui.settings.SettingsViewModel
+import com.example.financetracker.ui.settings.SettingsViewModelFactory
 
 class MainActivity : ComponentActivity() {
 
@@ -85,6 +91,14 @@ fun FinanceTrackerApp() {
         factory = StatisticsViewModelFactory(repository)
     )
 
+    val settingsViewModel: SettingsViewModel = viewModel(
+        factory = SettingsViewModelFactory(
+            context.applicationContext as Application
+        )
+    )
+
+    val currency by settingsViewModel.currency.collectAsState()
+
     val totalIncome by statisticsViewModel.totalIncome.collectAsState()
     val totalExpenses by statisticsViewModel.totalExpenses.collectAsState()
     val expensesByCategory by statisticsViewModel.expensesByCategory.collectAsState()
@@ -111,7 +125,7 @@ fun FinanceTrackerApp() {
         "Настройки"
     )
 
-    // Если открыт экран добавления операции,
+    // Если открыт экран добавления или редактирования операции,
     // показываем его вместо основного интерфейса
     if (showAddTransactionScreen || editingTransaction != null) {
 
@@ -124,6 +138,7 @@ fun FinanceTrackerApp() {
             onSave = { amount, isIncome, category, description, date ->
 
                 if (editingTransaction == null) {
+
                     addTransactionViewModel.addTransaction(
                         amount = amount,
                         isIncome = isIncome,
@@ -131,7 +146,9 @@ fun FinanceTrackerApp() {
                         description = description,
                         date = date
                     )
+
                 } else {
+
                     val updatedTransaction = editingTransaction!!.copy(
                         amount = amount,
                         isIncome = isIncome,
@@ -193,6 +210,7 @@ fun FinanceTrackerApp() {
                     balance = balance,
                     income = income,
                     expenses = expenses,
+                    currency = currency,
                     recentTransactions = homeTransactions.take(5),
                     onAddTransaction = {
                         editingTransaction = null
@@ -203,6 +221,7 @@ fun FinanceTrackerApp() {
 
                 1 -> TransactionsScreen(
                     transactions = transactions,
+                    currency = currency,
                     onDelete = { transaction ->
                         transactionsViewModel.deleteTransaction(transaction)
                     },
@@ -221,40 +240,18 @@ fun FinanceTrackerApp() {
                     onPeriodSelected = { period ->
                         statisticsViewModel.setPeriod(period)
                     },
+                    currency = currency,
                     modifier = Modifier.padding(innerPadding)
                 )
 
                 3 -> SettingsScreen(
+                    currency = currency,
+                    onCurrencySelected = { selectedCurrency ->
+                        settingsViewModel.setCurrency(selectedCurrency)
+                    },
                     modifier = Modifier.padding(innerPadding)
                 )
             }
         }
-    }
-}
-
-
-@Composable
-fun SettingsScreen(
-    modifier: Modifier = Modifier
-) {
-    SimpleScreen(
-        title = "Настройки",
-        modifier = modifier
-    )
-}
-
-@Composable
-fun SimpleScreen(
-    title: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = title
-        )
     }
 }

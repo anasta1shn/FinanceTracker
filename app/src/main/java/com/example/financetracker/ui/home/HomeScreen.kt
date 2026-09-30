@@ -30,6 +30,7 @@ fun HomeScreen(
     balance: Double,
     income: Double,
     expenses: Double,
+    currency: String,
     recentTransactions: List<TransactionEntity>,
     onAddTransaction: () -> Unit,
     modifier: Modifier = Modifier
@@ -84,7 +85,10 @@ fun HomeScreen(
             item {
 
                 BalanceCard(
-                    balance = formatCurrency(balance)
+                    balance = formatCurrency(
+                        amount = balance,
+                        currency = currency
+                    )
                 )
             }
 
@@ -96,7 +100,12 @@ fun HomeScreen(
 
                     SummaryCard(
                         title = "Доходы",
-                        amount = "+ ${formatCurrency(income)}",
+                        amount = "+ ${
+                            formatCurrency(
+                                amount = income,
+                                currency = currency
+                            )
+                        }",
                         modifier = Modifier.weight(1f)
                     )
 
@@ -106,7 +115,12 @@ fun HomeScreen(
 
                     SummaryCard(
                         title = "Расходы",
-                        amount = "- ${formatCurrency(expenses)}",
+                        amount = "- ${
+                            formatCurrency(
+                                amount = expenses,
+                                currency = currency
+                            )
+                        }",
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -144,7 +158,8 @@ fun HomeScreen(
                 ) { transaction ->
 
                     TransactionItem(
-                        transaction = transaction
+                        transaction = transaction,
+                        currency = currency
                     )
                 }
             }
@@ -228,7 +243,8 @@ private fun SummaryCard(
 
 @Composable
 private fun TransactionItem(
-    transaction: TransactionEntity
+    transaction: TransactionEntity,
+    currency: String
 ) {
 
     val sign = if (transaction.isIncome) "+" else "-"
@@ -263,7 +279,12 @@ private fun TransactionItem(
             }
 
             Text(
-                text = "$sign ${formatCurrency(transaction.amount)}",
+                text = "$sign ${
+                    formatCurrency(
+                        amount = transaction.amount,
+                        currency = currency
+                    )
+                }",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )

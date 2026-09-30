@@ -36,6 +36,7 @@ import java.util.Locale
 @Composable
 fun TransactionsScreen(
     transactions: List<TransactionEntity>,
+    currency: String,
     onDelete: (TransactionEntity) -> Unit,
     onEdit: (TransactionEntity) -> Unit,
     modifier: Modifier = Modifier
@@ -114,6 +115,7 @@ fun TransactionsScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             filters.forEach { filter ->
+
                 if (selectedFilter == filter) {
                     Button(
                         onClick = {
@@ -147,6 +149,7 @@ fun TransactionsScreen(
         )
 
         if (filteredTransactions.isEmpty()) {
+
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -170,7 +173,9 @@ fun TransactionsScreen(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+
         } else {
+
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -181,6 +186,7 @@ fun TransactionsScreen(
 
                     TransactionCard(
                         transaction = transaction,
+                        currency = currency,
                         onDelete = {
                             transactionToDelete = transaction
                         },
@@ -194,6 +200,7 @@ fun TransactionsScreen(
     }
 
     if (transactionToDelete != null) {
+
         AlertDialog(
             onDismissRequest = {
                 transactionToDelete = null
@@ -209,6 +216,7 @@ fun TransactionsScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
+
                         transactionToDelete?.let { transaction ->
                             onDelete(transaction)
                         }
@@ -235,6 +243,7 @@ fun TransactionsScreen(
 @Composable
 private fun TransactionCard(
     transaction: TransactionEntity,
+    currency: String,
     onDelete: () -> Unit,
     onEdit: () -> Unit
 ) {
@@ -256,9 +265,11 @@ private fun TransactionCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             Column(
                 modifier = Modifier.weight(1f)
             ) {
+
                 Text(
                     text = transaction.category,
                     style = MaterialTheme.typography.titleMedium,
@@ -285,7 +296,12 @@ private fun TransactionCard(
             )
 
             Text(
-                text = "$sign ${formatCurrency(transaction.amount)}",
+                text = "$sign ${
+                    formatCurrency(
+                        amount = transaction.amount,
+                        currency = currency
+                    )
+                }",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -304,3 +320,4 @@ private fun TransactionCard(
         }
     }
 }
+
