@@ -17,6 +17,7 @@ class SettingsViewModel(
             Application.MODE_PRIVATE
         )
 
+    // Валюта
     private val _currency = MutableStateFlow(
         preferences.getString("currency", "₽") ?: "₽"
     )
@@ -24,7 +25,6 @@ class SettingsViewModel(
     val currency: StateFlow<String> = _currency
 
     fun setCurrency(currency: String) {
-
         _currency.value = currency
 
         viewModelScope.launch {
@@ -33,4 +33,28 @@ class SettingsViewModel(
                 .apply()
         }
     }
+
+    // Месячный бюджет
+    private val _monthlyBudget = MutableStateFlow(
+        preferences.getString("monthly_budget", null)?.toDoubleOrNull()
+    )
+
+    val monthlyBudget: StateFlow<Double?> = _monthlyBudget
+
+    fun setMonthlyBudget(budget: Double?) {
+        _monthlyBudget.value = budget
+
+        viewModelScope.launch {
+            val editor = preferences.edit()
+
+            if (budget == null) {
+                editor.remove("monthly_budget")
+            } else {
+                editor.putString("monthly_budget", budget.toString())
+            }
+
+            editor.apply()
+        }
+    }
 }
+

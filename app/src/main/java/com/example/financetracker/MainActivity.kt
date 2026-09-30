@@ -98,6 +98,7 @@ fun FinanceTrackerApp() {
     )
 
     val currency by settingsViewModel.currency.collectAsState()
+    val monthlyBudget by settingsViewModel.monthlyBudget.collectAsState()
 
     val totalIncome by statisticsViewModel.totalIncome.collectAsState()
     val totalExpenses by statisticsViewModel.totalExpenses.collectAsState()
@@ -211,6 +212,7 @@ fun FinanceTrackerApp() {
                     income = income,
                     expenses = expenses,
                     currency = currency,
+                    monthlyBudget = monthlyBudget,
                     recentTransactions = homeTransactions.take(5),
                     onAddTransaction = {
                         editingTransaction = null
@@ -246,8 +248,12 @@ fun FinanceTrackerApp() {
 
                 3 -> SettingsScreen(
                     currency = currency,
+                    monthlyBudget = monthlyBudget,
                     onCurrencySelected = { selectedCurrency ->
                         settingsViewModel.setCurrency(selectedCurrency)
+                    },
+                    onBudgetSaved = { budget ->
+                        settingsViewModel.setMonthlyBudget(budget)
                     },
                     modifier = Modifier.padding(innerPadding)
                 )

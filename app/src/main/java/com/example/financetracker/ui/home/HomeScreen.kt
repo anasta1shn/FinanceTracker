@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,6 +32,7 @@ fun HomeScreen(
     income: Double,
     expenses: Double,
     currency: String,
+    monthlyBudget: Double?,
     recentTransactions: List<TransactionEntity>,
     onAddTransaction: () -> Unit,
     modifier: Modifier = Modifier
@@ -90,6 +92,16 @@ fun HomeScreen(
                         currency = currency
                     )
                 )
+            }
+
+            if (monthlyBudget != null) {
+                item {
+                    BudgetCard(
+                        spent = expenses,
+                        budget = monthlyBudget,
+                        currency = currency
+                    )
+                }
             }
 
             item {
@@ -209,6 +221,135 @@ private fun BalanceCard(
 }
 
 @Composable
+private fun BudgetCard(
+    spent: Double,
+    budget: Double,
+    currency: String
+) {
+    val progress = if (budget > 0) {
+        (spent / budget)
+            .coerceIn(0.0, 1.0)
+            .toFloat()
+    } else {
+        0f
+    }
+
+    val remaining = budget - spent
+    val spentPercentage = if (budget > 0) {
+        spent / budget
+    } else {
+        0.0
+    }
+
+    val statusText = when {
+        spentPercentage > 1.0 -> {
+            "Бюджет превышен"
+        }
+
+        spentPercentage >= 0.8 -> {
+            "Бюджет почти исчерпан"
+        }
+
+        else -> {
+            "Всё под контролем"
+        }
+    }
+
+    val statusColor = when {
+        spentPercentage > 1.0 -> {
+            MaterialTheme.colorScheme.error
+        }
+
+        spentPercentage >= 0.8 -> {
+            MaterialTheme.colorScheme.tertiary
+        }
+
+        else -> {
+            MaterialTheme.colorScheme.primary
+        }
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Бюджет на месяц",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+            Text(
+                text = "${formatCurrency(
+                    amount = spent,
+                    currency = currency
+                )} из ${formatCurrency(
+                    amount = budget,
+                    currency = currency
+                )}",
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+            LinearProgressIndicator(
+                progress = {
+                    progress
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+            Text(
+                text = when {
+                    remaining >= 0 -> {
+                        "Осталось: ${
+                            formatCurrency(
+                                amount = remaining,
+                                currency = currency
+                            )
+                        }"
+                    }
+
+                    else -> {
+                        "Превышение: ${
+                            formatCurrency(
+                                amount = -remaining,
+                                currency = currency
+                            )
+                        }"
+                    }
+                },
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+            Text(
+                text = statusText,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = statusColor
+            )
+        }
+    }
+}
+
+
+@Composable
 private fun SummaryCard(
     title: String,
     amount: String,
@@ -291,3 +432,4 @@ private fun TransactionItem(
         }
     }
 }
+
