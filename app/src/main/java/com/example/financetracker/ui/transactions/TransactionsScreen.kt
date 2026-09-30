@@ -1,5 +1,6 @@
 package com.example.financetracker.ui.transactions
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -30,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.example.financetracker.data.local.TransactionEntity
 import com.example.financetracker.util.formatCurrency
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -41,34 +44,75 @@ fun TransactionsScreen(
     onEdit: (TransactionEntity) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var searchQuery by remember {
-        mutableStateOf("")
-    }
+    var searchQuery by remember { mutableStateOf("") }
+    var transactionToDelete by remember { mutableStateOf<TransactionEntity?>(null) }
+    var selectedFilter by remember { mutableStateOf("Все") }
+    var selectedDateFilter by remember { mutableStateOf("Всё время") }
 
-    var transactionToDelete by remember {
-        mutableStateOf<TransactionEntity?>(null)
-    }
-
-    var selectedFilter by remember {
-        mutableStateOf("Все")
-    }
-
-    val filters = listOf(
-        "Все",
-        "Доходы",
-        "Расходы"
+    val filters = listOf("Все", "Доходы", "Расходы")
+    val dateFilters = listOf(
+        "Сегодня",
+        "Эта неделя",
+        "Этот месяц",
+        "Всё время"
     )
 
-    val filteredTransactions = transactions.filter { transaction ->
+    val dateFilterScrollState = rememberScrollState()
 
+    val now = System.currentTimeMillis()
+
+    val dateFilteredTransactions = transactions.filter { transaction ->
+        when (selectedDateFilter) {
+            "Сегодня" -> {
+                val calendar = Calendar.getInstance()
+
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+
+                transaction.date >= calendar.timeInMillis
+            }
+
+            "Эта неделя" -> {
+                val calendar = Calendar.getInstance()
+
+                calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+
+                transaction.date >= calendar.timeInMillis &&
+                        transaction.date <= now
+            }
+
+            "Этот месяц" -> {
+                val calendar = Calendar.getInstance()
+
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+
+                transaction.date >= calendar.timeInMillis
+            }
+
+            else -> true
+        }
+    }
+
+    val filteredTransactions = dateFilteredTransactions.filter { transaction ->
         val matchesSearch =
             transaction.description.contains(
                 searchQuery,
                 ignoreCase = true
-            ) || transaction.category.contains(
-                searchQuery,
-                ignoreCase = true
-            )
+            ) ||
+                    transaction.category.contains(
+                        searchQuery,
+                        ignoreCase = true
+                    )
 
         val matchesFilter = when (selectedFilter) {
             "Доходы" -> transaction.isIncome
@@ -90,32 +134,24 @@ fun TransactionsScreen(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(
-            modifier = Modifier.padding(top = 16.dp)
-        )
+        Spacer(modifier = Modifier.padding(top = 16.dp))
 
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
             modifier = Modifier.fillMaxWidth(),
-            label = {
-                Text("Поиск")
-            },
-            placeholder = {
-                Text("Описание или категория")
-            },
+            label = { Text("Поиск") },
+            placeholder = { Text("Описание или категория") },
             singleLine = true
         )
 
-        Spacer(
-            modifier = Modifier.padding(top = 12.dp)
-        )
+        Spacer(modifier = Modifier.padding(top = 12.dp))
 
+        // Фильтр по типу операции
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
             filters.forEach { filter ->
-
                 if (selectedFilter == filter) {
                     Button(
                         onClick = {
@@ -137,19 +173,44 @@ fun TransactionsScreen(
                 }
 
                 if (filter != filters.last()) {
-                    Spacer(
-                        modifier = Modifier.width(8.dp)
-                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
             }
         }
 
-        Spacer(
-            modifier = Modifier.padding(top = 16.dp)
-        )
+        Spacer(modifier = Modifier.padding(top = 12.dp))
+
+        // Фильтр по дате с горизонтальной прокруткой
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(dateFilterScrollState),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            dateFilters.forEach { filter ->
+                if (selectedDateFilter == filter) {
+                    Button(
+                        onClick = {
+                            selectedDateFilter = filter
+                        }
+                    ) {
+                        Text(filter)
+                    }
+                } else {
+                    OutlinedButton(
+                        onClick = {
+                            selectedDateFilter = filter
+                        }
+                    ) {
+                        Text(filter)
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
 
         if (filteredTransactions.isEmpty()) {
-
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -168,14 +229,12 @@ fun TransactionsScreen(
                     text = if (transactions.isEmpty()) {
                         "Добавьте первую операцию"
                     } else {
-                        "Попробуйте изменить запрос"
+                        "Попробуйте изменить фильтры"
                     },
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-
         } else {
-
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -183,7 +242,6 @@ fun TransactionsScreen(
                     items = filteredTransactions,
                     key = { it.id }
                 ) { transaction ->
-
                     TransactionCard(
                         transaction = transaction,
                         currency = currency,
@@ -199,8 +257,8 @@ fun TransactionsScreen(
         }
     }
 
+    // Диалог подтверждения удаления
     if (transactionToDelete != null) {
-
         AlertDialog(
             onDismissRequest = {
                 transactionToDelete = null
@@ -209,14 +267,11 @@ fun TransactionsScreen(
                 Text("Удалить операцию?")
             },
             text = {
-                Text(
-                    "Вы действительно хотите удалить эту операцию?"
-                )
+                Text("Вы действительно хотите удалить эту операцию?")
             },
             confirmButton = {
                 TextButton(
                     onClick = {
-
                         transactionToDelete?.let { transaction ->
                             onDelete(transaction)
                         }
@@ -265,11 +320,9 @@ private fun TransactionCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-
                 Text(
                     text = transaction.category,
                     style = MaterialTheme.typography.titleMedium,
@@ -291,9 +344,7 @@ private fun TransactionCard(
                 }
             }
 
-            Spacer(
-                modifier = Modifier.width(12.dp)
-            )
+            Spacer(modifier = Modifier.width(12.dp))
 
             Text(
                 text = "$sign ${
@@ -320,4 +371,3 @@ private fun TransactionCard(
         }
     }
 }
-
