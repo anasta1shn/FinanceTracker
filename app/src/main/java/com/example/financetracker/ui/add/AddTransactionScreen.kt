@@ -51,9 +51,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalContext
 import com.example.financetracker.data.local.TransactionEntity
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -304,23 +304,57 @@ fun AddTransactionScreen(
         )
 
         // Сумма
-        OutlinedTextField(
-            value = amount,
-            onValueChange = {
-                amount = it
-            },
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            label = {
-                Text("Сумма")
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Payments,
-                    contentDescription = null
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+
+                Text(
+                    text = "Сумма",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
-            },
-            singleLine = true
-        )
+
+                Spacer(
+                    modifier = Modifier.height(8.dp)
+                )
+
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = {
+                        amount = it
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text("0")
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Payments,
+                            contentDescription = null
+                        )
+                    },
+                    trailingIcon = {
+                        Text(
+                            text = "₽",
+                            modifier = Modifier.padding(end = 16.dp),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.headlineSmall
+                )
+            }
+        }
 
         Spacer(
             modifier = Modifier.height(16.dp)

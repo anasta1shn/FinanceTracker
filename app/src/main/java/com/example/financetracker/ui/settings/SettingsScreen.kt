@@ -4,21 +4,30 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +39,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
-import com.example.financetracker.util.formatCurrency
 
 @Composable
 fun SettingsScreen(
@@ -48,176 +56,79 @@ fun SettingsScreen(
 
     var budgetText by remember(monthlyBudget) {
         mutableStateOf(
-            monthlyBudget?.let {
-                if (it % 1.0 == 0.0) {
-                    it.toInt().toString()
-                } else {
-                    it.toString()
-                }
-            } ?: ""
+            monthlyBudget?.toString() ?: ""
         )
     }
 
-    val currencies = listOf("₽", "$", "€")
-
     Column(
         modifier = modifier
-            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
-        Text(
-            text = "Настройки",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
+        // Заголовок
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = null
+            )
 
-        Text(
-            text = "Настройте приложение под себя",
-            style = MaterialTheme.typography.bodyMedium
-        )
+            Spacer(
+                modifier = Modifier.width(12.dp)
+            )
 
-        Spacer(
-            modifier = Modifier.height(4.dp)
-        )
+            Column {
+                Text(
+                    text = "Настройки",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
 
+                Text(
+                    text = "Настройте приложение под себя",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+        // Валюта
         Card(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
         ) {
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
-
-                Text(
-                    text = "Основные настройки",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(
-                    modifier = Modifier.height(4.dp)
-                )
-
-                Text(
-                    text = "Выберите валюту, которая будет использоваться в приложении.",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
-
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.AttachMoney,
+                        contentDescription = null
+                    )
 
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
+                    Spacer(
+                        modifier = Modifier.width(10.dp)
+                    )
+
+                    Column {
                         Text(
                             text = "Валюта",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
 
                         Text(
-                            text = "Текущая: $currency",
+                            text = "Используется для отображения сумм",
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
-
-                    Column(
-                        horizontalAlignment = Alignment.End
-                    ) {
-
-                        TextButton(
-                            onClick = {
-                                currencyMenuExpanded = true
-                            }
-                        ) {
-                            Text(
-                                text = currency,
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        DropdownMenu(
-                            expanded = currencyMenuExpanded,
-                            onDismissRequest = {
-                                currencyMenuExpanded = false
-                            }
-                        ) {
-
-                            currencies.forEach { item ->
-
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            text = item
-                                        )
-                                    },
-                                    onClick = {
-                                        onCurrencySelected(item)
-                                        currencyMenuExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
                 }
-            }
-        }
-
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-
-                Text(
-                    text = "Бюджет",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(
-                    modifier = Modifier.height(4.dp)
-                )
-
-                Text(
-                    text = "Установите максимальную сумму расходов на месяц.",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
-
-                OutlinedTextField(
-                    value = budgetText,
-                    onValueChange = { value ->
-                        budgetText = value
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = {
-                        Text("Месячный бюджет")
-                    },
-                    placeholder = {
-                        Text("Например, 50000")
-                    },
-                    suffix = {
-                        Text(currency)
-                    },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal
-                    )
-                )
 
                 Spacer(
                     modifier = Modifier.height(12.dp)
@@ -225,117 +136,211 @@ fun SettingsScreen(
 
                 Button(
                     onClick = {
-                        val budget = budgetText
-                            .replace(',', '.')
-                            .toDoubleOrNull()
-
-                        if (budget != null && budget > 0) {
-                            onBudgetSaved(budget)
-                        }
+                        currencyMenuExpanded = true
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Сохранить бюджет")
+                    Icon(
+                        imageVector = Icons.Default.Payments,
+                        contentDescription = null
+                    )
+
+                    Spacer(
+                        modifier = Modifier.width(8.dp)
+                    )
+
+                    Text(
+                        text = "Текущая валюта: $currency"
+                    )
                 }
 
-                if (monthlyBudget != null) {
-
-                    Spacer(
-                        modifier = Modifier.height(16.dp)
-                    )
-
-                    Text(
-                        text = "Текущий бюджет",
-                        style = MaterialTheme.typography.labelLarge
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(4.dp)
-                    )
-
-                    Text(
-                        text = formatCurrency(
-                            amount = monthlyBudget,
-                            currency = currency
-                        ),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(12.dp)
-                    )
-
-                    OutlinedButton(
-                        onClick = {
-                            budgetText = ""
-                            onBudgetSaved(null)
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Сбросить бюджет")
+                DropdownMenu(
+                    expanded = currencyMenuExpanded,
+                    onDismissRequest = {
+                        currencyMenuExpanded = false
+                    }
+                ) {
+                    listOf("₽", "$", "€").forEach { item ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = when (item) {
+                                        "₽" -> "₽  Рубль"
+                                        "$" -> "$  Доллар"
+                                        else -> "€  Евро"
+                                    }
+                                )
+                            },
+                            onClick = {
+                                onCurrencySelected(item)
+                                currencyMenuExpanded = false
+                            }
+                        )
                     }
                 }
             }
         }
 
+        // Бюджет
         Card(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
         ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Wallet,
+                        contentDescription = null
+                    )
 
+                    Spacer(
+                        modifier = Modifier.width(10.dp)
+                    )
+
+                    Column {
+                        Text(
+                            text = "Месячный бюджет",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Text(
+                            text = "Лимит расходов на текущий месяц",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+                Spacer(
+                    modifier = Modifier.height(12.dp)
+                )
+
+                OutlinedTextField(
+                    value = budgetText,
+                    onValueChange = {
+                        budgetText = it
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = {
+                        Text("Бюджет")
+                    },
+                    placeholder = {
+                        Text("Например, 50000")
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Wallet,
+                            contentDescription = null
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal
+                    ),
+                    singleLine = true
+                )
+
+                Spacer(
+                    modifier = Modifier.height(12.dp)
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            val value = budgetText
+                                .replace(",", ".")
+                                .toDoubleOrNull()
+
+                            if (value != null && value > 0) {
+                                onBudgetSaved(value)
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Save,
+                            contentDescription = null
+                        )
+
+                        Spacer(
+                            modifier = Modifier.width(6.dp)
+                        )
+
+                        Text("Сохранить")
+                    }
+
+                    Button(
+                        onClick = {
+                            budgetText = ""
+                            onBudgetSaved(null)
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Сбросить")
+                    }
+                }
+            }
+        }
+
+        // Тема
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-
-                    Text(
-                        text = "Внешний вид",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(4.dp)
-                    )
-
-                    Text(
-                        text = if (isDarkTheme) {
-                            "Сейчас используется тёмная тема"
-                        } else {
-                            "Сейчас используется светлая тема"
-                        },
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(2.dp)
-                    )
-
-                    Text(
-                        text = "Изменить оформление приложения",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.DarkMode,
+                    contentDescription = null
+                )
 
                 Spacer(
                     modifier = Modifier.width(12.dp)
                 )
 
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = "Тёмная тема",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Text(
+                        text = if (isDarkTheme) {
+                            "Тёмная тема включена"
+                        } else {
+                            "Используется светлая тема"
+                        },
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
                 Switch(
                     checked = isDarkTheme,
-                    onCheckedChange = { enabled ->
-                        onThemeChanged(enabled)
-                    }
+                    onCheckedChange = onThemeChanged
                 )
             }
         }
+
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
     }
 }
 
