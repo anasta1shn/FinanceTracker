@@ -8,12 +8,28 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.CardGiftcard
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.Work
+import androidx.compose.material.icons.filled.WorkOutline
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -413,6 +429,15 @@ private fun TransactionItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
+            CategoryIcon(
+                category = transaction.category,
+                isIncome = transaction.isIncome
+            )
+
+            Spacer(
+                modifier = Modifier.width(12.dp)
+            )
+
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -444,4 +469,42 @@ private fun TransactionItem(
             )
         }
     }
+}
+
+@Composable
+private fun CategoryIcon(
+    category: String,
+    isIncome: Boolean
+) {
+    val icon = when (category) {
+        "Еда" -> Icons.Default.Restaurant
+        "Транспорт" -> Icons.Default.DirectionsCar
+        "Покупки" -> Icons.Default.ShoppingBag
+        "Развлечения" -> Icons.Default.Movie
+        "Здоровье" -> Icons.Default.Favorite
+        "Жильё" -> Icons.Default.Home
+        "Образование" -> Icons.Default.School
+        "Зарплата" -> Icons.Default.Work
+        "Подработка" -> Icons.Default.WorkOutline
+        "Подарок" -> Icons.Default.CardGiftcard
+        "Инвестиции" -> Icons.Default.TrendingUp
+        else -> {
+            if (isIncome) {
+                Icons.Default.AccountBalance
+            } else {
+                Icons.Default.MoreHoriz
+            }
+        }
+    }
+
+    Icon(
+        imageVector = icon,
+        contentDescription = category,
+        modifier = Modifier.size(28.dp),
+        tint = if (isIncome) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.error
+        }
+    )
 }
