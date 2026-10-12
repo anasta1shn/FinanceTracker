@@ -192,8 +192,6 @@ com.example.financetracker
 
 ## Скриншоты приложения
 
-## 📱 Скриншоты приложения
-
 <p align="center">
   <img src="https://github.com/user-attachments/assets/d73dd0ee-12e5-4f58-a05e-656f06b31a45" width="150" alt="Главный экран" />
   <img src="https://github.com/user-attachments/assets/a730dd92-8281-4f6f-bcf2-c74c821f2945" width="150" alt="Транзакции" />
