@@ -190,6 +190,23 @@ com.example.financetracker
 * локальным хранением данных;
 * Git и GitHub.
 
+## Скриншоты приложения
+
+* Главный экран
+  <img width="1280" height="2772" alt="Screenshot_2026_10_12_14_09_33_704_com_example_financetracker" src="https://github.com/user-attachments/assets/d73dd0ee-12e5-4f58-a05e-656f06b31a45" />
+
+* Транзакции
+<img width="1280" height="2772" alt="Screenshot_2026_10_12_14_09_39_905_com_example_financetracker" src="https://github.com/user-attachments/assets/a730dd92-8281-4f6f-bcf2-c74c821f2945" />
+
+* Добавление операции
+<img width="1280" height="2772" alt="Screenshot_2026_10_12_14_12_08_742_com_example_financetracker" src="https://github.com/user-attachments/assets/301f3d70-ab92-450c-bc6d-99b3ec9585eb" />
+
+* Статистика
+<img width="1280" height="2772" alt="Screenshot_2026_10_12_14_09_44_970_com_example_financetracker" src="https://github.com/user-attachments/assets/181bf6f8-7ae4-464a-a0f8-2e90300ad769" />
+
+* Настройки
+<img width="1280" height="2772" alt="Screenshot_2026_10_12_14_09_48_636_com_example_financetracker" src="https://github.com/user-attachments/assets/2804aebc-dc86-4e80-b49c-e1b75bfb76a8" />
+
 ## Статус
 
 **Проект завершён и готов к демонстрации.**
